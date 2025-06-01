@@ -1,0 +1,14 @@
+Метод,Endpoint,Описание,Параметры,Ответ
+GET,/api/dashboard/stats,Статистика дашборда,Нет,JSON с метриками
+GET,/api/accounts,Список email аккаунтов,Нет,Массив аккаунтов
+POST,/api/accounts,Добавить аккаунт,"email, provider, password",Результат операции
+POST,/api/accounts/:email/sync,Синхронизация,email в URL,Результат синхронизации
+GET,/api/documents,Список документов,"search, category, limit",Массив документов
+GET,/api/documents/categories,Категории документов,Нет,Статистика категорий
+POST,/api/upload,Загрузка файлов,multipart/form-data,Результат загрузки
+GET,/api/settings,Получить настройки,Нет,Объект настроек
+POST,/api/settings,Обновить настройки,JSON с настройками,Результат обновления
+POST,/api/webhook/email,Email webhook,JSON payload,Подтверждение получения
+GET,/health,Статус системы,Нет,Статус здоровья
+GET,/health/email,Статус email соединений,Нет,Статус соединений
+GET,/health/storage,Статус хранилища,Нет,Информация о хранилище
