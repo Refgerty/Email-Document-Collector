@@ -1,291 +1,315 @@
 <!DOCTYPE html>
-<html lang="ru">
+<html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Email Document Collector - Система сбора документов из почты</title>
+    <title>Email Document Collector</title>
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
-    <div class="app-container">
-        <!-- Боковая навигация -->
-        <nav class="sidebar">
-            <div class="sidebar-header">
-                <h2 class="sidebar-title">📧 EDC</h2>
+    <!-- Sidebar Navigation -->
+    <nav class="sidebar">
+        <div class="sidebar-header">
+            <h2>📧 Document Collector</h2>
+        </div>
+        <ul class="sidebar-menu">
+            <li class="sidebar-item active" data-page="dashboard">
+                <span class="icon">🏠</span>
+                <span>Dashboard</span>
+            </li>
+            <li class="sidebar-item" data-page="accounts">
+                <span class="icon">📧</span>
+                <span>Email Accounts</span>
+            </li>
+            <li class="sidebar-item" data-page="documents">
+                <span class="icon">📁</span>
+                <span>Documents</span>
+            </li>
+            <li class="sidebar-item" data-page="upload">
+                <span class="icon">📤</span>
+                <span>Upload</span>
+            </li>
+            <li class="sidebar-item" data-page="settings">
+                <span class="icon">⚙️</span>
+                <span>Settings</span>
+            </li>
+        </ul>
+    </nav>
+
+    <!-- Main Content -->
+    <main class="main-content">
+        <!-- Dashboard Page -->
+        <div class="page" id="dashboard-page">
+            <div class="page-header">
+                <h1>Dashboard</h1>
+                <p class="text-secondary">Overview of your document collection system</p>
             </div>
-            <ul class="sidebar-menu">
-                <li class="menu-item active" data-section="dashboard">
-                    <span class="menu-icon">🏠</span>
-                    <span class="menu-text">Главная</span>
-                </li>
-                <li class="menu-item" data-section="accounts">
-                    <span class="menu-icon">📧</span>
-                    <span class="menu-text">Email-аккаунты</span>
-                </li>
-                <li class="menu-item" data-section="documents">
-                    <span class="menu-icon">📄</span>
-                    <span class="menu-text">Документы</span>
-                </li>
-                <li class="menu-item" data-section="upload">
-                    <span class="menu-icon">📤</span>
-                    <span class="menu-text">Загрузка</span>
-                </li>
-                <li class="menu-item" data-section="settings">
-                    <span class="menu-icon">⚙️</span>
-                    <span class="menu-text">Настройки</span>
-                </li>
-            </ul>
-        </nav>
 
-        <!-- Основной контент -->
-        <main class="main-content">
-            <header class="content-header">
-                <h1 class="page-title">Email Document Collector</h1>
-                <p class="page-subtitle">Система сбора документов из почты</p>
-            </header>
-
-            <!-- Дашборд -->
-            <section id="dashboard" class="content-section active">
-                <div class="stats-grid">
-                    <div class="stat-card">
-                        <div class="stat-icon">📊</div>
-                        <div class="stat-content">
-                            <div class="stat-number">2,846</div>
-                            <div class="stat-label">Всего документов</div>
-                        </div>
-                    </div>
-                    <div class="stat-card">
-                        <div class="stat-icon">📧</div>
-                        <div class="stat-content">
-                            <div class="stat-number">3</div>
-                            <div class="stat-label">Активные аккаунты</div>
-                        </div>
-                    </div>
-                    <div class="stat-card">
-                        <div class="stat-icon">⚠️</div>
-                        <div class="stat-content">
-                            <div class="stat-number">2</div>
-                            <div class="stat-label">Ошибки сегодня</div>
-                        </div>
-                    </div>
-                    <div class="stat-card">
-                        <div class="stat-icon">💾</div>
-                        <div class="stat-content">
-                            <div class="stat-number">45.7 GB</div>
-                            <div class="stat-label">Использовано места</div>
-                        </div>
+            <!-- Stats Cards -->
+            <div class="stats-grid">
+                <div class="stat-card">
+                    <div class="stat-icon">📄</div>
+                    <div class="stat-content">
+                        <h3>2,846</h3>
+                        <p>Total Documents</p>
                     </div>
                 </div>
-
-                <div class="dashboard-grid">
-                    <div class="card">
-                        <div class="card__header">
-                            <h3>Последние документы</h3>
-                        </div>
-                        <div class="card__body">
-                            <div class="recent-documents-list" id="dashboardDocuments">
-                                <!-- Будет заполнено JS -->
-                            </div>
-                        </div>
-                    </div>
-
-                    <div class="card">
-                        <div class="card__header">
-                            <h3>Статистика по категориям</h3>
-                        </div>
-                        <div class="card__body">
-                            <div class="category-stats" id="dashboardCategories">
-                                <!-- Будет заполнено JS -->
-                            </div>
-                        </div>
+                <div class="stat-card">
+                    <div class="stat-icon">📧</div>
+                    <div class="stat-content">
+                        <h3>3</h3>
+                        <p>Active Accounts</p>
                     </div>
                 </div>
-            </section>
-
-            <!-- Email аккаунты -->
-            <section id="accounts" class="content-section">
-                <div class="section-header">
-                    <h2>Email-аккаунты</h2>
-                    <button class="btn btn--primary" id="addAccountBtn">Добавить аккаунт</button>
-                </div>
-                
-                <div class="accounts-grid" id="accountsGrid">
-                    <!-- Будет заполнено JS -->
-                </div>
-            </section>
-
-            <!-- Документы -->
-            <section id="documents" class="content-section">
-                <div class="section-header">
-                    <h2>Документы</h2>
-                    <div class="search-controls">
-                        <input type="text" class="form-control" placeholder="Поиск документов..." id="searchInput">
-                        <select class="form-control" id="categoryFilter">
-                            <option value="">Все категории</option>
-                        </select>
+                <div class="stat-card">
+                    <div class="stat-icon">⚠️</div>
+                    <div class="stat-content">
+                        <h3>2</h3>
+                        <p>Errors Today</p>
                     </div>
                 </div>
-
-                <div class="categories-grid" id="categoriesGrid">
-                    <!-- Будет заполнено JS -->
-                </div>
-
-                <div class="card mt-8">
-                    <div class="card__header">
-                        <h3>Последние документы</h3>
+                <div class="stat-card">
+                    <div class="stat-icon">💾</div>
+                    <div class="stat-content">
+                        <h3>45.7 GB</h3>
+                        <p>Storage Used</p>
                     </div>
+                </div>
+            </div>
+
+            <!-- Recent Documents -->
+            <div class="dashboard-section">
+                <h2>Recent Documents</h2>
+                <div class="card">
+                    <div class="table-container">
+                        <table class="data-table">
+                            <thead>
+                                <tr>
+                                    <th>File Name</th>
+                                    <th>Sender</th>
+                                    <th>Date Received</th>
+                                    <th>Size</th>
+                                    <th>Category</th>
+                                    <th>Status</th>
+                                </tr>
+                            </thead>
+                            <tbody id="recent-documents-tbody">
+                                <!-- Recent documents will be populated by JS -->
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Document Categories -->
+            <div class="dashboard-section">
+                <h2>Document Categories</h2>
+                <div class="categories-grid" id="categories-grid">
+                    <!-- Categories will be populated by JS -->
+                </div>
+            </div>
+        </div>
+
+        <!-- Email Accounts Page -->
+        <div class="page hidden" id="accounts-page">
+            <div class="page-header">
+                <h1>Email Accounts</h1>
+                <button class="btn btn--primary" id="add-account-btn">Add Account</button>
+            </div>
+
+            <div class="accounts-grid" id="accounts-grid">
+                <!-- Account cards will be populated by JS -->
+            </div>
+        </div>
+
+        <!-- Documents Page -->
+        <div class="page hidden" id="documents-page">
+            <div class="page-header">
+                <h1>Documents</h1>
+            </div>
+
+            <div class="documents-filters">
+                <div class="form-group">
+                    <input type="text" class="form-control" id="search-documents" placeholder="Search documents...">
+                </div>
+                <div class="form-group">
+                    <select class="form-control" id="category-filter">
+                        <option value="">All Categories</option>
+                        <option value="Invoices">Invoices</option>
+                        <option value="Contracts">Contracts</option>
+                        <option value="Reports">Reports</option>
+                        <option value="Presentations">Presentations</option>
+                        <option value="Images">Images</option>
+                        <option value="Archives">Archives</option>
+                        <option value="Other">Other</option>
+                    </select>
+                </div>
+            </div>
+
+            <div class="card">
+                <div class="table-container">
+                    <table class="data-table">
+                        <thead>
+                            <tr>
+                                <th>File Name</th>
+                                <th>Sender</th>
+                                <th>Date Received</th>
+                                <th>Size</th>
+                                <th>Category</th>
+                                <th>Status</th>
+                            </tr>
+                        </thead>
+                        <tbody id="documents-tbody">
+                            <!-- Documents will be populated by JS -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <!-- Upload Page -->
+        <div class="page hidden" id="upload-page">
+            <div class="page-header">
+                <h1>Upload Documents</h1>
+                <p class="text-secondary">Upload documents manually to your collection</p>
+            </div>
+
+            <div class="upload-area" id="upload-area">
+                <div class="upload-icon">📁</div>
+                <h3>Drag files here or click to select</h3>
+                <p>Supported formats: PDF, DOCX, XLSX, PPTX, PNG, JPG, ZIP</p>
+                <p>Maximum file size: 10 MB</p>
+                <input type="file" id="file-input" multiple accept=".pdf,.docx,.xlsx,.pptx,.png,.jpg,.jpeg,.zip" hidden>
+                <button class="btn btn--primary" id="select-files-btn">Select Files</button>
+            </div>
+
+            <div class="upload-queue" id="upload-queue">
+                <h3>Upload Queue</h3>
+                <div id="upload-items">
+                    <!-- Upload items will be populated by JS -->
+                </div>
+            </div>
+        </div>
+
+        <!-- Settings Page -->
+        <div class="page hidden" id="settings-page">
+            <div class="page-header">
+                <h1>Settings</h1>
+                <p class="text-secondary">Configure your document collection preferences</p>
+            </div>
+
+            <div class="settings-section">
+                <h2>General Settings</h2>
+                <div class="card">
                     <div class="card__body">
-                        <div class="documents-table">
-                            <table id="documentsTable">
-                                <thead>
-                                    <tr>
-                                        <th>Файл</th>
-                                        <th>Отправитель</th>
-                                        <th>Дата получения</th>
-                                        <th>Размер</th>
-                                        <th>Категория</th>
-                                        <th>Статус</th>
-                                    </tr>
-                                </thead>
-                                <tbody id="documentsTableBody">
-                                    <!-- Будет заполнено JS -->
-                                </tbody>
-                            </table>
+                        <div class="form-group">
+                            <div class="setting-item">
+                                <div class="setting-info">
+                                    <label>Auto-processing</label>
+                                    <p class="text-secondary">Automatically process new documents</p>
+                                </div>
+                                <div class="toggle-switch">
+                                    <input type="checkbox" id="auto-processing" checked>
+                                    <label for="auto-processing"></label>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Maximum File Size</label>
+                            <select class="form-control" id="max-file-size">
+                                <option value="5">5 MB</option>
+                                <option value="10" selected>10 MB</option>
+                                <option value="20">20 MB</option>
+                                <option value="50">50 MB</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Storage Period</label>
+                            <select class="form-control" id="storage-period">
+                                <option value="6">6 months</option>
+                                <option value="12">12 months</option>
+                                <option value="24" selected>24 months</option>
+                                <option value="unlimited">Unlimited</option>
+                            </select>
                         </div>
                     </div>
                 </div>
-            </section>
+            </div>
 
-            <!-- Загрузка -->
-            <section id="upload" class="content-section">
-                <div class="section-header">
-                    <h2>Загрузка файлов</h2>
-                </div>
-
-                <div class="upload-area" id="uploadArea">
-                    <div class="upload-icon">📤</div>
-                    <div class="upload-text">
-                        <h3>Перетащите файлы сюда или нажмите для выбора</h3>
-                        <p>Поддерживаемые форматы: PDF, DOCX, XLSX, PPTX, PNG, JPG, ZIP</p>
-                        <p>Максимальный размер файла: 10 MB</p>
-                    </div>
-                    <input type="file" id="fileInput" multiple accept=".pdf,.docx,.xlsx,.pptx,.png,.jpg,.jpeg,.zip" hidden>
-                </div>
-
-                <div class="upload-queue" id="uploadQueue" style="display: none;">
-                    <h3>Очередь загрузки</h3>
-                    <div id="uploadList"></div>
-                </div>
-            </section>
-
-            <!-- Настройки -->
-            <section id="settings" class="content-section">
-                <div class="section-header">
-                    <h2>Настройки</h2>
-                </div>
-
-                <div class="settings-grid">
-                    <div class="card">
-                        <div class="card__header">
-                            <h3>Общие настройки</h3>
-                        </div>
-                        <div class="card__body">
-                            <div class="form-group">
-                                <label class="form-label">Автоматическая обработка</label>
-                                <label class="toggle">
-                                    <input type="checkbox" id="autoProcessing" checked>
-                                    <span class="toggle-slider"></span>
-                                </label>
-                            </div>
-                            <div class="form-group">
-                                <label class="form-label">Максимальный размер файла</label>
-                                <select class="form-control" id="maxFileSize">
-                                    <option value="5">5 MB</option>
-                                    <option value="10" selected>10 MB</option>
-                                    <option value="20">20 MB</option>
-                                    <option value="50">50 MB</option>
-                                </select>
-                            </div>
-                            <div class="form-group">
-                                <label class="form-label">Период хранения</label>
-                                <select class="form-control" id="retentionPeriod">
-                                    <option value="6">6 месяцев</option>
-                                    <option value="12" selected>12 месяцев</option>
-                                    <option value="24">24 месяца</option>
-                                    <option value="0">Без ограничений</option>
-                                </select>
+            <div class="settings-section">
+                <h2>Notifications</h2>
+                <div class="card">
+                    <div class="card__body">
+                        <div class="form-group">
+                            <div class="setting-item">
+                                <div class="setting-info">
+                                    <label>Email Notifications</label>
+                                    <p class="text-secondary">Receive email updates about new documents</p>
+                                </div>
+                                <div class="toggle-switch">
+                                    <input type="checkbox" id="email-notifications" checked>
+                                    <label for="email-notifications"></label>
+                                </div>
                             </div>
                         </div>
-                    </div>
-
-                    <div class="card">
-                        <div class="card__header">
-                            <h3>Уведомления</h3>
-                        </div>
-                        <div class="card__body">
-                            <div class="form-group">
-                                <label class="form-label">Email уведомления</label>
-                                <label class="toggle">
-                                    <input type="checkbox" id="emailNotifications" checked>
-                                    <span class="toggle-slider"></span>
-                                </label>
-                            </div>
-                            <div class="form-group">
-                                <label class="form-label">Уведомления об ошибках</label>
-                                <label class="toggle">
-                                    <input type="checkbox" id="errorNotifications" checked>
-                                    <span class="toggle-slider"></span>
-                                </label>
+                        <div class="form-group">
+                            <div class="setting-item">
+                                <div class="setting-info">
+                                    <label>Error Notifications</label>
+                                    <p class="text-secondary">Get notified when errors occur</p>
+                                </div>
+                                <div class="toggle-switch">
+                                    <input type="checkbox" id="error-notifications" checked>
+                                    <label for="error-notifications"></label>
+                                </div>
                             </div>
                         </div>
                     </div>
                 </div>
+            </div>
+        </div>
+    </main>
 
-                <div class="mt-8">
-                    <button class="btn btn--primary">Сохранить настройки</button>
-                </div>
-            </section>
-        </main>
-    </div>
-
-    <!-- Модальное окно добавления аккаунта -->
-    <div class="modal-overlay" id="addAccountModal">
+    <!-- Add Account Modal -->
+    <div class="modal-overlay hidden" id="add-account-modal">
         <div class="modal">
             <div class="modal-header">
-                <h3>Добавить Email-аккаунт</h3>
-                <button class="modal-close" id="closeModal">&times;</button>
+                <h3>Add Email Account</h3>
+                <button class="close-btn" id="close-modal">&times;</button>
             </div>
             <div class="modal-body">
-                <form id="addAccountForm">
+                <form id="add-account-form">
                     <div class="form-group">
-                        <label class="form-label">Email адрес</label>
-                        <input type="email" class="form-control" placeholder="example@domain.com" required>
+                        <label class="form-label">Email Address</label>
+                        <input type="email" class="form-control" id="account-email" required>
                     </div>
                     <div class="form-group">
-                        <label class="form-label">Провайдер</label>
-                        <select class="form-control" required>
-                            <option value="">Выберите провайдер</option>
-                            <option value="gmail">Gmail</option>
-                            <option value="outlook">Outlook</option>
-                            <option value="yahoo">Yahoo</option>
-                            <option value="other">Другой</option>
+                        <label class="form-label">Provider</label>
+                        <select class="form-control" id="account-provider" required>
+                            <option value="">Select Provider</option>
+                            <option value="Gmail">Gmail</option>
+                            <option value="Outlook">Outlook</option>
+                            <option value="Yahoo">Yahoo</option>
+                            <option value="Other">Other</option>
                         </select>
                     </div>
                     <div class="form-group">
-                        <label class="form-label">Пароль</label>
-                        <input type="password" class="form-control" placeholder="Пароль приложения" required>
+                        <label class="form-label">Password</label>
+                        <input type="password" class="form-control" id="account-password" required>
                     </div>
                 </form>
             </div>
             <div class="modal-footer">
-                <button class="btn btn--secondary" id="cancelModal">Отмена</button>
-                <button class="btn btn--primary" type="submit" form="addAccountForm">Добавить</button>
+                <button class="btn btn--secondary" id="cancel-add-account">Cancel</button>
+                <button class="btn btn--primary" id="confirm-add-account">Add Account</button>
             </div>
         </div>
     </div>
 
-    <!-- Система уведомлений -->
-    <div class="notifications" id="notifications"></div>
+    <!-- Toast Notifications -->
+    <div class="toast-container" id="toast-container">
+        <!-- Toast notifications will be populated by JS -->
+    </div>
 
     <script src="app.js"></script>
 </body>
