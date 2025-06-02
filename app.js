@@ -1,694 +1,510 @@
+// Email Document Collector Application
 document.addEventListener('DOMContentLoaded', () => {
-    // Initialize Feather Icons
-    feather.replace();
-
-    // Initialize navigation
-    initNavigation();
-    
-    // Initialize modals
-    initModals();
-    
-    // Initialize Dashboard Chart
-    initDashboardChart();
-    
-    // Initialize Document Filtering
-    initDocumentFiltering();
-    
-    // Initialize Upload functionality
-    initUploadFunctionality();
-    
-    // Initialize Settings
-    initSettings();
-    
-    // Initialize Email Accounts Actions
-    initAccountActions();
-});
-
-// Navigation functionality
-function initNavigation() {
-    const navItems = document.querySelectorAll('.nav-item');
-    const contentSections = document.querySelectorAll('.content-section');
-    const sectionTitle = document.getElementById('section-title');
-    const sidebarToggle = document.getElementById('toggle-sidebar');
-    const sidebar = document.querySelector('.sidebar');
-    
-    // Toggle sidebar on mobile
-    sidebarToggle.addEventListener('click', () => {
-        sidebar.classList.toggle('open');
-    });
-    
-    // Navigation click handler
-    navItems.forEach(item => {
-        item.addEventListener('click', (e) => {
-            e.preventDefault();
-            
-            // Remove active class from all items
-            navItems.forEach(navItem => navItem.classList.remove('active'));
-            
-            // Add active class to clicked item
-            item.classList.add('active');
-            
-            // Get section ID
-            const sectionId = item.dataset.section;
-            
-            // Hide all sections
-            contentSections.forEach(section => section.classList.remove('active'));
-            
-            // Show selected section
-            document.getElementById(sectionId).classList.add('active');
-            
-            // Update section title
-            sectionTitle.textContent = item.querySelector('span').textContent;
-            
-            // Close sidebar on mobile after navigation
-            if (window.innerWidth <= 768) {
-                sidebar.classList.remove('open');
+    // Application data
+    const appData = {
+        statistics: {
+            totalDocuments: 2846,
+            activeAccounts: 3,
+            errorsToday: 0,
+            storageUsed: "45.7 GB"
+        },
+        emailAccounts: [
+            {
+                id: 1,
+                provider: "Gmail",
+                email: "user@gmail.com",
+                status: "Connected",
+                lastSync: "2 minutes ago",
+                documents: 1234
+            },
+            {
+                id: 2,
+                provider: "Outlook",
+                email: "user@outlook.com", 
+                status: "Connected",
+                lastSync: "5 minutes ago",
+                documents: 892
+            },
+            {
+                id: 3,
+                provider: "Yahoo",
+                email: "user@yahoo.com",
+                status: "Syncing",
+                lastSync: "1 hour ago",
+                documents: 720
             }
-            
-            // Update URL hash
-            window.location.hash = sectionId;
-        });
-    });
-    
-    // Check for URL hash on page load
-    if (window.location.hash) {
-        const hash = window.location.hash.substring(1);
-        const navItem = document.querySelector(`.nav-item[data-section="${hash}"]`);
-        if (navItem) {
-            navItem.click();
-        }
-    }
-    
-    // Quick actions navigation
-    document.querySelectorAll('.quick-actions button').forEach(button => {
-        button.addEventListener('click', () => {
-            const action = button.textContent.trim();
-            
-            if (action.includes('Email Account')) {
-                // Navigate to email accounts and open modal
-                document.querySelector('.nav-item[data-section="email-accounts"]').click();
-                showModal('add-account-modal');
-            } else if (action.includes('Upload')) {
-                // Navigate to upload section
-                document.querySelector('.nav-item[data-section="upload"]').click();
-            } else if (action.includes('Sync')) {
-                // Show sync toast
-                showToast('Syncing all accounts...', 'info');
+        ],
+        documentCategories: [
+            {name: "Invoices", count: 856, color: "#ef4444"},
+            {name: "Contracts", count: 432, color: "#3b82f6"},
+            {name: "Reports", count: 789, color: "#10b981"},
+            {name: "Presentations", count: 234, color: "#f59e0b"},
+            {name: "Images", count: 345, color: "#8b5cf6"},
+            {name: "Archives", count: 123, color: "#06b6d4"},
+            {name: "Other", count: 67, color: "#6b7280"}
+        ]
+    };
+
+    // Authentication API mock service
+    const authService = {
+        login: (email, password) => {
+            return new Promise((resolve, reject) => {
                 setTimeout(() => {
-                    showToast('All accounts synced successfully!', 'success');
-                }, 2000);
-            } else if (action.includes('Settings')) {
-                // Navigate to settings
-                document.querySelector('.nav-item[data-section="settings"]').click();
+                    // Mock authentication - accept any email with password length > 5
+                    if (email && password && password.length > 5) {
+                        const user = {
+                            id: 123,
+                            firstName: email.split('@')[0],
+                            lastName: 'User',
+                            email: email,
+                            token: 'mock-jwt-token-' + Math.random().toString(36).substring(2)
+                        };
+                        resolve(user);
+                    } else {
+                        reject(new Error('Invalid email or password'));
+                    }
+                }, 1000);
+            });
+        },
+        register: (firstName, lastName, email, password, confirmPassword) => {
+            return new Promise((resolve, reject) => {
+                setTimeout(() => {
+                    // Mock registration - validate input and create user
+                    if (password !== confirmPassword) {
+                        reject(new Error('Passwords do not match'));
+                        return;
+                    }
+                    if (password.length < 6) {
+                        reject(new Error('Password must be at least 6 characters'));
+                        return;
+                    }
+                    if (!firstName || !lastName || !email) {
+                        reject(new Error('Please fill all required fields'));
+                        return;
+                    }
+                    const user = {
+                        id: 123,
+                        firstName: firstName,
+                        lastName: lastName,
+                        email: email,
+                        token: 'mock-jwt-token-' + Math.random().toString(36).substring(2)
+                    };
+                    resolve(user);
+                }, 1000);
+            });
+        }
+    };
+
+    // DOM Elements
+    const elements = {
+        // Auth forms
+        authSection: document.getElementById('auth-section'),
+        loginForm: document.getElementById('login-form'),
+        registerForm: document.getElementById('register-form'),
+        loginFormElement: document.getElementById('login-form-element'),
+        registerFormElement: document.getElementById('register-form-element'),
+        showRegisterBtn: document.getElementById('show-register'),
+        showLoginBtn: document.getElementById('show-login'),
+        
+        // Password toggles
+        loginPasswordToggle: document.getElementById('login-password-toggle'),
+        registerPasswordToggle: document.getElementById('register-password-toggle'),
+        registerConfirmPasswordToggle: document.getElementById('register-confirm-password-toggle'),
+        
+        // Error messages
+        loginEmailError: document.getElementById('login-email-error'),
+        loginPasswordError: document.getElementById('login-password-error'),
+        registerFirstnameError: document.getElementById('register-firstname-error'),
+        registerLastnameError: document.getElementById('register-lastname-error'),
+        registerEmailError: document.getElementById('register-email-error'),
+        registerPasswordError: document.getElementById('register-password-error'),
+        registerConfirmPasswordError: document.getElementById('register-confirm-password-error'),
+        
+        // Dashboard
+        dashboardSection: document.getElementById('dashboard-section'),
+        userName: document.getElementById('user-name'),
+        logoutBtn: document.getElementById('logout-btn'),
+        navLinks: document.querySelectorAll('.nav-link'),
+        contentSections: document.querySelectorAll('.content-section'),
+        
+        // Statistics
+        totalDocuments: document.getElementById('total-documents'),
+        activeAccounts: document.getElementById('active-accounts'),
+        errorsToday: document.getElementById('errors-today'),
+        storageUsed: document.getElementById('storage-used'),
+        
+        // Dynamic content containers
+        categoriesList: document.getElementById('categories-list'),
+        emailAccountsList: document.getElementById('email-accounts-list'),
+        
+        // Profile form
+        profileForm: document.getElementById('profile-form'),
+        profileFirstname: document.getElementById('profile-firstname'),
+        profileLastname: document.getElementById('profile-lastname'),
+        profileEmail: document.getElementById('profile-email'),
+        
+        // Toast container
+        toastContainer: document.getElementById('toast-container')
+    };
+
+    // Authentication handlers
+    function initAuth() {
+        // Check if user is already logged in
+        const user = getUserFromStorage();
+        if (user && user.token) {
+            showDashboard(user);
+        } else {
+            hideLoaders();
+        }
+
+        // Switch between login and register forms
+        elements.showRegisterBtn.addEventListener('click', (e) => {
+            e.preventDefault();
+            elements.loginForm.classList.remove('active');
+            elements.registerForm.classList.add('active');
+        });
+
+        elements.showLoginBtn.addEventListener('click', (e) => {
+            e.preventDefault();
+            elements.registerForm.classList.remove('active');
+            elements.loginForm.classList.add('active');
+        });
+
+        // Password toggle functionality
+        setupPasswordToggle(elements.loginPasswordToggle, 'login-password');
+        setupPasswordToggle(elements.registerPasswordToggle, 'register-password');
+        setupPasswordToggle(elements.registerConfirmPasswordToggle, 'register-confirm-password');
+
+        // Form submission
+        elements.loginFormElement.addEventListener('submit', handleLogin);
+        elements.registerFormElement.addEventListener('submit', handleRegister);
+    }
+
+    function setupPasswordToggle(toggleBtn, inputId) {
+        const passwordInput = document.getElementById(inputId);
+        toggleBtn.addEventListener('click', () => {
+            if (passwordInput.type === 'password') {
+                passwordInput.type = 'text';
+                toggleBtn.querySelector('.password-toggle-icon').textContent = '👁️‍🗨️';
+            } else {
+                passwordInput.type = 'password';
+                toggleBtn.querySelector('.password-toggle-icon').textContent = '👁️';
             }
         });
-    });
-}
+    }
 
-// Modal functionality
-function initModals() {
-    const addAccountBtn = document.getElementById('add-account-btn');
-    const modalClose = document.getElementById('modal-close');
-    const cancelAddAccount = document.getElementById('cancel-add-account');
-    const submitAddAccount = document.getElementById('submit-add-account');
-    const addAccountModal = document.getElementById('add-account-modal');
-    const emailProvider = document.getElementById('email-provider');
-    const imapSettings = document.getElementById('imap-settings');
-    
-    // Show modal when Add Account button is clicked
-    addAccountBtn.addEventListener('click', () => {
-        showModal('add-account-modal');
-    });
-    
-    // Close modal when X button is clicked
-    modalClose.addEventListener('click', () => {
-        hideModal('add-account-modal');
-    });
-    
-    // Close modal when Cancel button is clicked
-    cancelAddAccount.addEventListener('click', () => {
-        hideModal('add-account-modal');
-    });
-    
-    // Handle form submission
-    submitAddAccount.addEventListener('click', (e) => {
+    async function handleLogin(e) {
         e.preventDefault();
+        const email = document.getElementById('login-email').value.trim();
+        const password = document.getElementById('login-password').value;
+        const rememberMe = document.getElementById('remember-me').checked;
         
-        const emailAddress = document.getElementById('email-address').value;
-        const emailPassword = document.getElementById('email-password').value;
-        const provider = emailProvider.value;
+        resetErrors();
         
-        if (!emailAddress || !emailPassword) {
-            showToast('Please fill in all required fields.', 'error');
-            return;
+        // Form validation
+        let isValid = true;
+        
+        if (!email) {
+            elements.loginEmailError.textContent = 'Please enter your email';
+            isValid = false;
+        } else if (!isValidEmail(email)) {
+            elements.loginEmailError.textContent = 'Please enter a valid email';
+            isValid = false;
         }
         
-        // Additional validation for IMAP settings
-        if (provider === 'imap') {
-            const imapServer = document.getElementById('imap-server').value;
-            const imapPort = document.getElementById('imap-port').value;
-            
-            if (!imapServer || !imapPort) {
-                showToast('Please fill in IMAP server information.', 'error');
-                return;
-            }
+        if (!password) {
+            elements.loginPasswordError.textContent = 'Please enter your password';
+            isValid = false;
         }
+        
+        if (!isValid) return;
         
         // Show loading state
-        submitAddAccount.innerHTML = '<i data-feather="loader"></i> Adding...';
-        submitAddAccount.disabled = true;
-        feather.replace();
+        showLoaders();
+        const authBtn = e.target.querySelector('.auth-btn');
+        authBtn.querySelector('.btn-text').classList.add('hidden');
+        authBtn.querySelector('.btn-loader').classList.remove('hidden');
         
-        // Simulate API call
-        setTimeout(() => {
-            hideModal('add-account-modal');
-            showToast(`Successfully connected to ${emailAddress}`, 'success');
-            
-            // Reset form
-            document.getElementById('add-account-form').reset();
-            submitAddAccount.innerHTML = 'Add Account';
-            submitAddAccount.disabled = false;
-            
-            // Add new account to the grid
-            addNewAccount(emailAddress, provider);
-        }, 2000);
-    });
-    
-    // Toggle IMAP settings based on provider selection
-    emailProvider.addEventListener('change', () => {
-        if (emailProvider.value === 'imap') {
-            imapSettings.classList.remove('hidden');
-        } else {
-            imapSettings.classList.add('hidden');
+        try {
+            const user = await authService.login(email, password);
+            saveUserToStorage(user, rememberMe);
+            showToast('Login successful!', 'success');
+            showDashboard(user);
+        } catch (error) {
+            showToast(error.message || 'Login failed. Please try again.', 'error');
+        } finally {
+            hideLoaders();
+            authBtn.querySelector('.btn-text').classList.remove('hidden');
+            authBtn.querySelector('.btn-loader').classList.add('hidden');
         }
-    });
-}
-
-// Show modal function
-function showModal(modalId) {
-    const modal = document.getElementById(modalId);
-    modal.classList.add('show');
-}
-
-// Hide modal function
-function hideModal(modalId) {
-    const modal = document.getElementById(modalId);
-    modal.classList.remove('show');
-}
-
-// Toast notification function
-function showToast(message, type = 'info') {
-    const toastContainer = document.getElementById('toast-container');
-    
-    const toast = document.createElement('div');
-    toast.className = `toast ${type}`;
-    
-    let icon;
-    switch (type) {
-        case 'success':
-            icon = 'check-circle';
-            break;
-        case 'error':
-            icon = 'alert-circle';
-            break;
-        case 'warning':
-            icon = 'alert-triangle';
-            break;
-        default:
-            icon = 'info';
     }
-    
-    toast.innerHTML = `
-        <i data-feather="${icon}"></i>
-        <div class="toast-message">${message}</div>
-        <button class="toast-close">
-            <i data-feather="x"></i>
-        </button>
-    `;
-    
-    toastContainer.appendChild(toast);
-    
-    // Replace feather icons
-    feather.replace();
-    
-    // Show the toast
-    setTimeout(() => toast.classList.add('show'), 10);
-    
-    // Add event listener to close button
-    toast.querySelector('.toast-close').addEventListener('click', () => {
-        toast.classList.remove('show');
-        setTimeout(() => toast.remove(), 300);
-    });
-    
-    // Auto-remove toast after 5 seconds
-    setTimeout(() => {
-        if (toast.parentNode) {
-            toast.classList.remove('show');
-            setTimeout(() => toast.remove(), 300);
-        }
-    }, 5000);
-}
 
-// Dashboard Chart
-function initDashboardChart() {
-    const ctx = document.getElementById('documentsChart');
-    if (!ctx) return;
-    
-    const chartData = {
-        labels: ['May 26', 'May 27', 'May 28', 'May 29', 'May 30', 'May 31', 'Jun 01', 'Jun 02'],
-        datasets: [{
-            label: 'Documents Processed',
-            data: [45, 52, 38, 67, 74, 83, 91, 78],
-            backgroundColor: 'rgba(6, 182, 212, 0.2)',
-            borderColor: 'rgba(6, 182, 212, 1)',
-            borderWidth: 2,
-            pointBackgroundColor: 'rgba(6, 182, 212, 1)',
-            pointBorderColor: '#fff',
-            pointBorderWidth: 2,
-            pointRadius: 5,
-            pointHoverRadius: 7,
-            tension: 0.3
-        }]
-    };
-    
-    new Chart(ctx, {
-        type: 'line',
-        data: chartData,
-        options: {
-            responsive: true,
-            maintainAspectRatio: false,
-            plugins: {
-                legend: {
-                    display: false
-                },
-                tooltip: {
-                    backgroundColor: 'rgba(0, 0, 0, 0.7)',
-                    bodyFont: {
-                        size: 13
-                    },
-                    padding: 10,
-                    cornerRadius: 8
-                }
-            },
-            scales: {
-                x: {
-                    grid: {
-                        display: false
-                    }
-                },
-                y: {
-                    beginAtZero: true,
-                    grid: {
-                        color: 'rgba(0, 0, 0, 0.05)'
-                    },
-                    ticks: {
-                        stepSize: 20
-                    }
-                }
-            }
-        }
-    });
-}
-
-// Document Filtering
-function initDocumentFiltering() {
-    const filterButtons = document.querySelectorAll('.filter-btn');
-    const documentList = document.getElementById('documents-list');
-    const documentSearch = document.getElementById('document-search');
-    
-    if (!filterButtons.length || !documentList || !documentSearch) return;
-    
-    // Handle filter button clicks
-    filterButtons.forEach(button => {
-        button.addEventListener('click', () => {
-            // Remove active class from all buttons
-            filterButtons.forEach(btn => btn.classList.remove('active'));
-            
-            // Add active class to clicked button
-            button.classList.add('active');
-            
-            // Get selected filter
-            const filter = button.dataset.filter;
-            
-            // Apply filtering
-            filterDocuments(filter);
-        });
-    });
-    
-    // Handle search input
-    documentSearch.addEventListener('input', () => {
-        const searchTerm = documentSearch.value.toLowerCase();
-        const activeFilter = document.querySelector('.filter-btn.active').dataset.filter;
-        
-        filterDocuments(activeFilter, searchTerm);
-    });
-    
-    function filterDocuments(filter, searchTerm = '') {
-        const rows = documentList.querySelectorAll('tr');
-        
-        rows.forEach(row => {
-            const category = row.querySelector('.category-badge')?.textContent;
-            const name = row.querySelector('.document-name span')?.textContent.toLowerCase();
-            const sender = row.querySelector('td:nth-child(3)')?.textContent.toLowerCase();
-            
-            const matchesFilter = filter === 'all' || category === filter;
-            const matchesSearch = !searchTerm || 
-                                name?.includes(searchTerm) || 
-                                sender?.includes(searchTerm);
-            
-            if (matchesFilter && matchesSearch) {
-                row.style.display = '';
-            } else {
-                row.style.display = 'none';
-            }
-        });
-    }
-}
-
-// Upload Functionality
-function initUploadFunctionality() {
-    const dropzone = document.getElementById('dropzone');
-    const fileInput = document.getElementById('file-input');
-    const progressContainer = document.getElementById('upload-progress-container');
-    const progressList = document.getElementById('progress-list');
-    
-    if (!dropzone || !fileInput || !progressContainer || !progressList) return;
-    
-    // Handle drag events
-    ['dragenter', 'dragover', 'dragleave', 'drop'].forEach(eventName => {
-        dropzone.addEventListener(eventName, preventDefaults, false);
-    });
-    
-    function preventDefaults(e) {
+    async function handleRegister(e) {
         e.preventDefault();
-        e.stopPropagation();
+        const firstName = document.getElementById('register-firstname').value.trim();
+        const lastName = document.getElementById('register-lastname').value.trim();
+        const email = document.getElementById('register-email').value.trim();
+        const password = document.getElementById('register-password').value;
+        const confirmPassword = document.getElementById('register-confirm-password').value;
+        
+        resetErrors();
+        
+        // Form validation
+        let isValid = true;
+        
+        if (!firstName) {
+            elements.registerFirstnameError.textContent = 'First name is required';
+            isValid = false;
+        }
+        
+        if (!lastName) {
+            elements.registerLastnameError.textContent = 'Last name is required';
+            isValid = false;
+        }
+        
+        if (!email) {
+            elements.registerEmailError.textContent = 'Email is required';
+            isValid = false;
+        } else if (!isValidEmail(email)) {
+            elements.registerEmailError.textContent = 'Please enter a valid email';
+            isValid = false;
+        }
+        
+        if (!password) {
+            elements.registerPasswordError.textContent = 'Password is required';
+            isValid = false;
+        } else if (password.length < 6) {
+            elements.registerPasswordError.textContent = 'Password must be at least 6 characters';
+            isValid = false;
+        }
+        
+        if (!confirmPassword) {
+            elements.registerConfirmPasswordError.textContent = 'Please confirm your password';
+            isValid = false;
+        } else if (password !== confirmPassword) {
+            elements.registerConfirmPasswordError.textContent = 'Passwords do not match';
+            isValid = false;
+        }
+        
+        if (!isValid) return;
+        
+        // Show loading state
+        showLoaders();
+        const authBtn = e.target.querySelector('.auth-btn');
+        authBtn.querySelector('.btn-text').classList.add('hidden');
+        authBtn.querySelector('.btn-loader').classList.remove('hidden');
+        
+        try {
+            const user = await authService.register(firstName, lastName, email, password, confirmPassword);
+            saveUserToStorage(user, true);
+            showToast('Registration successful!', 'success');
+            showDashboard(user);
+        } catch (error) {
+            showToast(error.message || 'Registration failed. Please try again.', 'error');
+        } finally {
+            hideLoaders();
+            authBtn.querySelector('.btn-text').classList.remove('hidden');
+            authBtn.querySelector('.btn-loader').classList.add('hidden');
+        }
     }
-    
-    // Highlight drop area when item is dragged over it
-    ['dragenter', 'dragover'].forEach(eventName => {
-        dropzone.addEventListener(eventName, () => {
-            dropzone.classList.add('dragover');
-        });
-    });
-    
-    ['dragleave', 'drop'].forEach(eventName => {
-        dropzone.addEventListener(eventName, () => {
-            dropzone.classList.remove('dragover');
-        });
-    });
-    
-    // Handle dropped files
-    dropzone.addEventListener('drop', (e) => {
-        const files = e.dataTransfer.files;
-        handleFiles(files);
-    });
-    
-    // Handle selected files
-    fileInput.addEventListener('change', () => {
-        const files = fileInput.files;
-        handleFiles(files);
-    });
-    
-    function handleFiles(files) {
-        if (!files.length) return;
-        
-        // Show progress container
-        progressContainer.classList.add('show');
-        
-        // Process each file
-        Array.from(files).forEach(file => {
-            uploadFile(file);
+
+    function resetErrors() {
+        const errorElements = document.querySelectorAll('.error-message');
+        errorElements.forEach(element => {
+            element.textContent = '';
         });
     }
-    
-    function uploadFile(file) {
-        // Create progress item
-        const progressItem = document.createElement('div');
-        progressItem.className = 'progress-item';
-        progressItem.innerHTML = `
-            <div class="progress-header">
-                <div class="progress-filename">${file.name}</div>
-                <div class="progress-percentage">0%</div>
-            </div>
-            <div class="progress-bar">
-                <div class="progress-fill" style="width: 0%"></div>
-            </div>
-        `;
+
+    function isValidEmail(email) {
+        const re = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+        return re.test(email);
+    }
+
+    function showLoaders() {
+        document.querySelectorAll('.auth-btn').forEach(btn => {
+            btn.disabled = true;
+        });
+    }
+
+    function hideLoaders() {
+        document.querySelectorAll('.auth-btn').forEach(btn => {
+            btn.disabled = false;
+            const btnLoader = btn.querySelector('.btn-loader');
+            const btnText = btn.querySelector('.btn-text');
+            if (btnLoader) btnLoader.classList.add('hidden');
+            if (btnText) btnText.classList.remove('hidden');
+        });
+    }
+
+    // Dashboard handlers
+    function initDashboard() {
+        // Populate statistics
+        elements.totalDocuments.textContent = appData.statistics.totalDocuments.toLocaleString();
+        elements.activeAccounts.textContent = appData.statistics.activeAccounts;
+        elements.errorsToday.textContent = appData.statistics.errorsToday;
+        elements.storageUsed.textContent = appData.statistics.storageUsed;
         
-        progressList.appendChild(progressItem);
+        // Logout button
+        elements.logoutBtn.addEventListener('click', handleLogout);
         
-        // Simulate upload progress
-        let progress = 0;
-        const progressFill = progressItem.querySelector('.progress-fill');
-        const progressPercentage = progressItem.querySelector('.progress-percentage');
-        
-        const interval = setInterval(() => {
-            progress += 5;
-            progressFill.style.width = `${progress}%`;
-            progressPercentage.textContent = `${progress}%`;
-            
-            if (progress >= 100) {
-                clearInterval(interval);
+        // Dashboard navigation
+        elements.navLinks.forEach(link => {
+            link.addEventListener('click', (e) => {
+                e.preventDefault();
+                const targetSection = link.getAttribute('data-section');
                 
-                // Show success message
-                setTimeout(() => {
-                    // Replace progress item with success message
-                    progressItem.innerHTML = `
-                        <div class="progress-header">
-                            <div class="progress-filename">${file.name}</div>
-                            <div class="progress-status">
-                                <span class="status status--success">Complete</span>
-                            </div>
-                        </div>
-                    `;
-                    
-                    // Show toast notification
-                    showToast(`${file.name} uploaded successfully!`, 'success');
-                    
-                    // Add to recent uploads
-                    addToRecentUploads(file);
-                }, 500);
+                // Deactivate all links and sections
+                elements.navLinks.forEach(navLink => navLink.classList.remove('active'));
+                elements.contentSections.forEach(section => section.classList.remove('active'));
+                
+                // Activate selected link and section
+                link.classList.add('active');
+                document.getElementById(`${targetSection}-content`).classList.add('active');
+            });
+        });
+        
+        // Populate document categories
+        populateCategories();
+        
+        // Populate email accounts
+        populateEmailAccounts();
+        
+        // Profile form
+        elements.profileForm.addEventListener('submit', (e) => {
+            e.preventDefault();
+            const user = getUserFromStorage();
+            if (user) {
+                user.firstName = elements.profileFirstname.value.trim();
+                user.lastName = elements.profileLastname.value.trim();
+                saveUserToStorage(user, true);
+                elements.userName.textContent = `${user.firstName} ${user.lastName}`;
+                showToast('Profile updated successfully', 'success');
             }
-        }, 100);
-    }
-    
-    function addToRecentUploads(file) {
-        const tbody = document.querySelector('.upload-table tbody');
-        if (!tbody) return;
-        
-        const date = new Date().toISOString().split('T')[0];
-        const type = getFileType(file.name);
-        const size = formatFileSize(file.size);
-        
-        const tr = document.createElement('tr');
-        tr.innerHTML = `
-            <td class="document-name">
-                <i data-feather="file-text"></i>
-                <span>${file.name}</span>
-            </td>
-            <td>${size}</td>
-            <td>${type}</td>
-            <td>${date}</td>
-            <td>
-                <span class="status status--success">Complete</span>
-            </td>
-        `;
-        
-        tbody.prepend(tr);
-        feather.replace();
-    }
-    
-    function getFileType(filename) {
-        const ext = filename.split('.').pop().toLowerCase();
-        
-        if (['pdf'].includes(ext)) return 'PDF';
-        if (['doc', 'docx'].includes(ext)) return 'Document';
-        if (['xls', 'xlsx'].includes(ext)) return 'Spreadsheet';
-        if (['ppt', 'pptx'].includes(ext)) return 'Presentation';
-        if (['jpg', 'jpeg', 'png', 'gif'].includes(ext)) return 'Image';
-        if (['zip', 'rar'].includes(ext)) return 'Archive';
-        
-        return 'Other';
-    }
-    
-    function formatFileSize(bytes) {
-        if (bytes === 0) return '0 Bytes';
-        
-        const k = 1024;
-        const sizes = ['Bytes', 'KB', 'MB', 'GB'];
-        const i = Math.floor(Math.log(bytes) / Math.log(k));
-        
-        return parseFloat((bytes / Math.pow(k, i)).toFixed(1)) + ' ' + sizes[i];
-    }
-}
-
-// Settings functionality
-function initSettings() {
-    const autoSyncToggle = document.getElementById('auto-sync-toggle');
-    const syncInterval = document.getElementById('sync-interval');
-    const maxFileSize = document.getElementById('max-file-size');
-    const retentionPeriod = document.getElementById('retention-period');
-    const emailNotificationsToggle = document.getElementById('email-notifications-toggle');
-    const errorNotificationsToggle = document.getElementById('error-notifications-toggle');
-    const saveBtn = document.querySelector('.settings-actions .btn--primary');
-    const resetBtn = document.querySelector('.settings-actions .btn--secondary');
-    
-    if (!autoSyncToggle || !syncInterval || !saveBtn || !resetBtn) return;
-    
-    // Set initial values from settings data
-    syncInterval.value = 5; // Default to 5 minutes
-    
-    // Save button click handler
-    saveBtn.addEventListener('click', () => {
-        // Collect settings
-        const settings = {
-            autoSync: autoSyncToggle.checked,
-            syncInterval: parseInt(syncInterval.value, 10),
-            maxFileSize: parseInt(maxFileSize.value, 10),
-            retentionPeriod: parseInt(retentionPeriod.value, 10),
-            emailNotifications: emailNotificationsToggle.checked,
-            errorNotifications: errorNotificationsToggle.checked
-        };
-        
-        // Save settings (would normally send to server)
-        console.log('Settings saved:', settings);
-        
-        // Show success toast
-        showToast('Settings saved successfully!', 'success');
-    });
-    
-    // Reset button click handler
-    resetBtn.addEventListener('click', () => {
-        // Reset to default values
-        autoSyncToggle.checked = true;
-        syncInterval.value = 5;
-        maxFileSize.value = 50;
-        retentionPeriod.value = 24;
-        emailNotificationsToggle.checked = true;
-        errorNotificationsToggle.checked = true;
-        
-        // Show info toast
-        showToast('Settings reset to defaults.', 'info');
-    });
-}
-
-// Email accounts actions
-function initAccountActions() {
-    const syncButtons = document.querySelectorAll('.account-actions button:first-child');
-    
-    // Add event listeners to sync buttons
-    syncButtons.forEach(button => {
-        button.addEventListener('click', (e) => {
-            const accountCard = e.target.closest('.account-card');
-            const accountEmail = accountCard.querySelector('.account-email').textContent;
-            
-            // Disable button and show syncing
-            button.disabled = true;
-            button.innerHTML = '<i data-feather="loader"></i> Syncing...';
-            feather.replace();
-            
-            // Set status to syncing
-            const statusEl = accountCard.querySelector('.account-status span');
-            statusEl.className = 'status status--warning';
-            statusEl.textContent = 'Syncing';
-            
-            // Simulate sync
-            setTimeout(() => {
-                // Update status
-                statusEl.className = 'status status--success';
-                statusEl.textContent = 'Connected';
-                
-                // Re-enable button
-                button.disabled = false;
-                button.innerHTML = '<i data-feather="refresh-cw"></i> Sync';
-                feather.replace();
-                
-                // Show toast
-                showToast(`${accountEmail} synced successfully!`, 'success');
-                
-                // Update last sync time
-                const lastSyncEl = accountCard.querySelector('.account-stat:nth-child(2) .stat-value');
-                lastSyncEl.textContent = 'Just now';
-            }, 2000);
         });
-    });
-}
+    }
 
-// Add new account to the grid
-function addNewAccount(email, provider) {
-    const accountsGrid = document.querySelector('.accounts-grid');
-    if (!accountsGrid) return;
-    
-    // Convert provider to proper case
-    const formattedProvider = provider.charAt(0).toUpperCase() + provider.slice(1);
-    
-    // Create an icon based on provider
-    let icon;
-    switch (provider) {
-        case 'gmail':
-            icon = '📧';
-            break;
-        case 'outlook':
-            icon = '📩';
-            break;
-        case 'yahoo':
-            icon = '📨';
-            break;
-        default:
-            icon = '📮';
+    function populateCategories() {
+        elements.categoriesList.innerHTML = '';
+        
+        appData.documentCategories.forEach(category => {
+            const categoryItem = document.createElement('div');
+            categoryItem.className = 'category-item';
+            categoryItem.style.setProperty('--category-color', category.color);
+            
+            categoryItem.innerHTML = `
+                <span class="category-name">${category.name}</span>
+                <span class="category-count">${category.count.toLocaleString()}</span>
+            `;
+            
+            elements.categoriesList.appendChild(categoryItem);
+        });
     }
-    
-    // Create new account card
-    const newAccount = document.createElement('div');
-    newAccount.className = 'account-card';
-    newAccount.innerHTML = `
-        <div class="account-header">
-            <div class="account-icon ${provider}">${icon}</div>
-            <div class="account-status">
-                <span class="status status--success">Connected</span>
-            </div>
-        </div>
-        <div class="account-body">
-            <h4 class="account-email">${email}</h4>
-            <p class="account-provider">${formattedProvider}</p>
-            <div class="account-stats">
-                <div class="account-stat">
-                    <span class="stat-label">Documents</span>
-                    <span class="stat-value">0</span>
+
+    function populateEmailAccounts() {
+        elements.emailAccountsList.innerHTML = '';
+        
+        appData.emailAccounts.forEach(account => {
+            const accountCard = document.createElement('div');
+            accountCard.className = 'account-card';
+            
+            let statusClass = '';
+            if (account.status === 'Connected') {
+                statusClass = 'status--success';
+            } else if (account.status === 'Syncing') {
+                statusClass = 'status--info';
+            } else {
+                statusClass = 'status--error';
+            }
+            
+            accountCard.innerHTML = `
+                <div class="account-provider">${account.provider.charAt(0)}</div>
+                <div class="account-info">
+                    <h4>${account.email}</h4>
+                    <p>${account.provider} account</p>
                 </div>
-                <div class="account-stat">
-                    <span class="stat-label">Last Sync</span>
-                    <span class="stat-value">Just now</span>
+                <div class="account-status">
+                    <div class="status ${statusClass}">${account.status}</div>
+                    <div class="account-meta">
+                        <div>Last sync: ${account.lastSync}</div>
+                        <div>Documents: ${account.documents}</div>
+                    </div>
                 </div>
-            </div>
-        </div>
-        <div class="account-actions">
-            <button class="btn btn--secondary btn--sm">
-                <i data-feather="refresh-cw"></i>
-                Sync
-            </button>
-            <button class="btn btn--secondary btn--sm">
-                <i data-feather="settings"></i>
-            </button>
-            <button class="btn btn--secondary btn--sm">
-                <i data-feather="trash-2"></i>
-            </button>
-        </div>
-    `;
-    
-    // Add to grid
-    accountsGrid.appendChild(newAccount);
-    
-    // Initialize feather icons
-    feather.replace();
-    
-    // Update stats card
-    const accountsCountEl = document.querySelector('.stat-card:nth-child(2) .stat-value');
-    if (accountsCountEl) {
-        const currentCount = parseInt(accountsCountEl.textContent.trim(), 10);
-        accountsCountEl.textContent = currentCount + 1;
+            `;
+            
+            elements.emailAccountsList.appendChild(accountCard);
+        });
     }
-    
-    // Add event listeners to new buttons
-    initAccountActions();
-}
+
+    function showDashboard(user) {
+        // Set user name
+        elements.userName.textContent = `${user.firstName} ${user.lastName}`;
+        
+        // Fill profile form
+        elements.profileFirstname.value = user.firstName;
+        elements.profileLastname.value = user.lastName;
+        elements.profileEmail.value = user.email;
+        
+        // Hide auth section and show dashboard
+        elements.authSection.classList.add('hidden');
+        elements.dashboardSection.classList.remove('hidden');
+    }
+
+    function handleLogout() {
+        removeUserFromStorage();
+        elements.dashboardSection.classList.add('hidden');
+        elements.authSection.classList.remove('hidden');
+        
+        // Reset forms
+        elements.loginFormElement.reset();
+        elements.registerFormElement.reset();
+        elements.loginForm.classList.add('active');
+        elements.registerForm.classList.remove('active');
+        
+        showToast('You have been logged out', 'info');
+    }
+
+    // User session management
+    function saveUserToStorage(user, remember) {
+        // If remember me is checked, use localStorage, otherwise sessionStorage
+        const storage = remember ? localStorage : sessionStorage;
+        storage.setItem('user', JSON.stringify(user));
+    }
+
+    function getUserFromStorage() {
+        // Check both localStorage and sessionStorage
+        const user = localStorage.getItem('user') || sessionStorage.getItem('user');
+        return user ? JSON.parse(user) : null;
+    }
+
+    function removeUserFromStorage() {
+        localStorage.removeItem('user');
+        sessionStorage.removeItem('user');
+    }
+
+    // Toast notifications
+    function showToast(message, type = 'info') {
+        const toast = document.createElement('div');
+        toast.className = `toast toast--${type}`;
+        toast.innerHTML = message;
+        
+        elements.toastContainer.appendChild(toast);
+        
+        // Force reflow to enable animations
+        toast.offsetHeight;
+        
+        // Show toast with animation
+        toast.classList.add('show');
+        
+        // Remove toast after 3 seconds
+        setTimeout(() => {
+            toast.classList.remove('show');
+            setTimeout(() => {
+                elements.toastContainer.removeChild(toast);
+            }, 300); // Match the CSS transition time
+        }, 3000);
+    }
+
+    // Initialize the application
+    initAuth();
+    initDashboard();
+});

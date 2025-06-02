@@ -5,751 +5,300 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Email Document Collector</title>
     <link rel="stylesheet" href="style.css">
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/feather-icons/dist/feather.min.css">
-    <script src="https://cdn.jsdelivr.net/npm/feather-icons/dist/feather.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 </head>
 <body>
-    <div class="app-container">
-        <!-- Sidebar Navigation -->
-        <aside class="sidebar">
-            <div class="sidebar-header">
-                <h1 class="sidebar-title">E-Doc Collector</h1>
-                <button id="toggle-sidebar" class="btn btn--secondary btn--sm">
-                    <i data-feather="menu"></i>
-                </button>
+    <!-- Toast Notifications -->
+    <div id="toast-container" class="toast-container"></div>
+
+    <!-- Authentication Section -->
+    <div id="auth-section" class="auth-section">
+        <div class="auth-container">
+            <div class="auth-header">
+                <h1>Email Document Collector</h1>
+                <p>Manage and organize your email documents efficiently</p>
             </div>
-            
-            <nav class="sidebar-nav">
-                <ul class="nav-list">
-                    <li class="nav-item active" data-section="dashboard">
-                        <a href="#" class="nav-link">
-                            <i data-feather="home"></i>
-                            <span>Dashboard</span>
-                        </a>
-                    </li>
-                    <li class="nav-item" data-section="email-accounts">
-                        <a href="#" class="nav-link">
-                            <i data-feather="mail"></i>
-                            <span>Email Accounts</span>
-                        </a>
-                    </li>
-                    <li class="nav-item" data-section="documents">
-                        <a href="#" class="nav-link">
-                            <i data-feather="file-text"></i>
-                            <span>Documents</span>
-                        </a>
-                    </li>
-                    <li class="nav-item" data-section="upload">
-                        <a href="#" class="nav-link">
-                            <i data-feather="upload-cloud"></i>
-                            <span>Upload</span>
-                        </a>
-                    </li>
-                    <li class="nav-item" data-section="settings">
-                        <a href="#" class="nav-link">
-                            <i data-feather="settings"></i>
-                            <span>Settings</span>
-                        </a>
-                    </li>
-                </ul>
-            </nav>
-        </aside>
 
-        <!-- Main Content Area -->
-        <main class="main-content">
-            <header class="content-header">
-                <div class="content-title">
-                    <h2 id="section-title">Dashboard</h2>
-                </div>
-                <div class="content-actions">
-                    <div class="notification-icon">
-                        <i data-feather="bell"></i>
-                        <span class="notification-badge">2</span>
-                    </div>
-                    <div class="user-profile">
-                        <div class="user-avatar">JD</div>
-                        <div class="user-info">
-                            <span class="user-name">John Doe</span>
-                            <span class="user-role">Administrator</span>
-                        </div>
-                    </div>
-                </div>
-            </header>
-
-            <!-- Dashboard Section -->
-            <section id="dashboard" class="content-section active">
-                <div class="stats-grid">
-                    <div class="stat-card">
-                        <div class="stat-icon documents-icon">
-                            <i data-feather="file-text"></i>
-                        </div>
-                        <div class="stat-info">
-                            <h3 class="stat-value">2,846</h3>
-                            <p class="stat-label">Total Documents</p>
-                        </div>
-                    </div>
-                    <div class="stat-card">
-                        <div class="stat-icon accounts-icon">
-                            <i data-feather="mail"></i>
-                        </div>
-                        <div class="stat-info">
-                            <h3 class="stat-value">3</h3>
-                            <p class="stat-label">Active Email Accounts</p>
-                        </div>
-                    </div>
-                    <div class="stat-card">
-                        <div class="stat-icon errors-icon">
-                            <i data-feather="alert-circle"></i>
-                        </div>
-                        <div class="stat-info">
-                            <h3 class="stat-value">0</h3>
-                            <p class="stat-label">Errors Today</p>
-                        </div>
-                    </div>
-                    <div class="stat-card">
-                        <div class="stat-icon storage-icon">
-                            <i data-feather="database"></i>
-                        </div>
-                        <div class="stat-info">
-                            <h3 class="stat-value">45.7 GB</h3>
-                            <p class="stat-label">Storage Used</p>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="dashboard-grid">
-                    <div class="card chart-card">
-                        <div class="card__header">
-                            <h3>Document Processing</h3>
-                            <div class="card-actions">
-                                <button class="btn btn--secondary btn--sm">
-                                    <i data-feather="refresh-cw"></i>
-                                </button>
-                            </div>
-                        </div>
-                        <div class="card__body">
-                            <canvas id="documentsChart" height="250"></canvas>
-                        </div>
-                    </div>
-
-                    <div class="card activity-card">
-                        <div class="card__header">
-                            <h3>Recent Activity</h3>
-                            <div class="card-actions">
-                                <button class="btn btn--secondary btn--sm">
-                                    <i data-feather="more-horizontal"></i>
-                                </button>
-                            </div>
-                        </div>
-                        <div class="card__body">
-                            <ul class="activity-list">
-                                <li class="activity-item">
-                                    <div class="activity-icon">
-                                        <i data-feather="file-plus"></i>
-                                    </div>
-                                    <div class="activity-details">
-                                        <p class="activity-title">New document processed</p>
-                                        <p class="activity-desc">Invoice_2024_001.pdf from accounting@supplier.com</p>
-                                        <span class="activity-time">2 min ago</span>
-                                    </div>
-                                </li>
-                                <li class="activity-item">
-                                    <div class="activity-icon">
-                                        <i data-feather="refresh-cw"></i>
-                                    </div>
-                                    <div class="activity-details">
-                                        <p class="activity-title">Email account synced</p>
-                                        <p class="activity-desc">business@outlook.com completed sync</p>
-                                        <span class="activity-time">5 min ago</span>
-                                    </div>
-                                </li>
-                                <li class="activity-item">
-                                    <div class="activity-icon">
-                                        <i data-feather="upload"></i>
-                                    </div>
-                                    <div class="activity-details">
-                                        <p class="activity-title">Document uploaded</p>
-                                        <p class="activity-desc">Manual upload: Contract_Agreement.docx</p>
-                                        <span class="activity-time">12 min ago</span>
-                                    </div>
-                                </li>
-                                <li class="activity-item">
-                                    <div class="activity-icon">
-                                        <i data-feather="file-plus"></i>
-                                    </div>
-                                    <div class="activity-details">
-                                        <p class="activity-title">New document processed</p>
-                                        <p class="activity-desc">Monthly_Report.xlsx from reports@analytics.com</p>
-                                        <span class="activity-time">18 min ago</span>
-                                    </div>
-                                </li>
-                            </ul>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="quick-actions">
-                    <h3 class="section-title">Quick Actions</h3>
-                    <div class="action-buttons">
-                        <button class="btn btn--primary">
-                            <i data-feather="mail-plus"></i>
-                            Add Email Account
-                        </button>
-                        <button class="btn btn--primary">
-                            <i data-feather="upload"></i>
-                            Upload Document
-                        </button>
-                        <button class="btn btn--primary">
-                            <i data-feather="refresh-cw"></i>
-                            Sync All Accounts
-                        </button>
-                        <button class="btn btn--secondary">
-                            <i data-feather="settings"></i>
-                            Configure Settings
-                        </button>
-                    </div>
-                </div>
-            </section>
-
-            <!-- Email Accounts Section -->
-            <section id="email-accounts" class="content-section">
-                <div class="section-header">
-                    <h3 class="section-title">Connected Email Accounts</h3>
-                    <button id="add-account-btn" class="btn btn--primary">
-                        <i data-feather="plus"></i>
-                        Add Account
-                    </button>
-                </div>
-
-                <div class="accounts-grid">
-                    <div class="account-card">
-                        <div class="account-header">
-                            <div class="account-icon gmail">📧</div>
-                            <div class="account-status">
-                                <span class="status status--success">Connected</span>
-                            </div>
-                        </div>
-                        <div class="account-body">
-                            <h4 class="account-email">john.doe@gmail.com</h4>
-                            <p class="account-provider">Gmail</p>
-                            <div class="account-stats">
-                                <div class="account-stat">
-                                    <span class="stat-label">Documents</span>
-                                    <span class="stat-value">1,234</span>
-                                </div>
-                                <div class="account-stat">
-                                    <span class="stat-label">Last Sync</span>
-                                    <span class="stat-value">2 minutes ago</span>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="account-actions">
-                            <button class="btn btn--secondary btn--sm">
-                                <i data-feather="refresh-cw"></i>
-                                Sync
-                            </button>
-                            <button class="btn btn--secondary btn--sm">
-                                <i data-feather="settings"></i>
-                            </button>
-                            <button class="btn btn--secondary btn--sm">
-                                <i data-feather="trash-2"></i>
-                            </button>
-                        </div>
-                    </div>
-
-                    <div class="account-card">
-                        <div class="account-header">
-                            <div class="account-icon outlook">📩</div>
-                            <div class="account-status">
-                                <span class="status status--success">Connected</span>
-                            </div>
-                        </div>
-                        <div class="account-body">
-                            <h4 class="account-email">business@outlook.com</h4>
-                            <p class="account-provider">Outlook</p>
-                            <div class="account-stats">
-                                <div class="account-stat">
-                                    <span class="stat-label">Documents</span>
-                                    <span class="stat-value">987</span>
-                                </div>
-                                <div class="account-stat">
-                                    <span class="stat-label">Last Sync</span>
-                                    <span class="stat-value">5 minutes ago</span>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="account-actions">
-                            <button class="btn btn--secondary btn--sm">
-                                <i data-feather="refresh-cw"></i>
-                                Sync
-                            </button>
-                            <button class="btn btn--secondary btn--sm">
-                                <i data-feather="settings"></i>
-                            </button>
-                            <button class="btn btn--secondary btn--sm">
-                                <i data-feather="trash-2"></i>
-                            </button>
-                        </div>
-                    </div>
-
-                    <div class="account-card">
-                        <div class="account-header">
-                            <div class="account-icon imap">📮</div>
-                            <div class="account-status">
-                                <span class="status status--warning">Syncing</span>
-                            </div>
-                        </div>
-                        <div class="account-body">
-                            <h4 class="account-email">support@company.com</h4>
-                            <p class="account-provider">IMAP</p>
-                            <div class="account-stats">
-                                <div class="account-stat">
-                                    <span class="stat-label">Documents</span>
-                                    <span class="stat-value">625</span>
-                                </div>
-                                <div class="account-stat">
-                                    <span class="stat-label">Last Sync</span>
-                                    <span class="stat-value">1 hour ago</span>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="account-actions">
-                            <button class="btn btn--secondary btn--sm" disabled>
-                                <i data-feather="refresh-cw"></i>
-                                Syncing...
-                            </button>
-                            <button class="btn btn--secondary btn--sm">
-                                <i data-feather="settings"></i>
-                            </button>
-                            <button class="btn btn--secondary btn--sm">
-                                <i data-feather="trash-2"></i>
-                            </button>
-                        </div>
-                    </div>
-                </div>
-            </section>
-
-            <!-- Documents Section -->
-            <section id="documents" class="content-section">
-                <div class="section-header">
-                    <div class="search-container">
-                        <div class="search-box">
-                            <i data-feather="search"></i>
-                            <input type="text" id="document-search" placeholder="Search documents...">
-                        </div>
-                    </div>
-                </div>
-
-                <div class="document-filters">
-                    <button class="filter-btn active" data-filter="all">All</button>
-                    <button class="filter-btn" data-filter="Invoices">Invoices</button>
-                    <button class="filter-btn" data-filter="Contracts">Contracts</button>
-                    <button class="filter-btn" data-filter="Reports">Reports</button>
-                    <button class="filter-btn" data-filter="Presentations">Presentations</button>
-                    <button class="filter-btn" data-filter="Images">Images</button>
-                    <button class="filter-btn" data-filter="Archives">Archives</button>
-                    <button class="filter-btn" data-filter="Other">Other</button>
-                </div>
-
-                <div class="documents-table-container">
-                    <table class="documents-table">
-                        <thead>
-                            <tr>
-                                <th>Name</th>
-                                <th>Size</th>
-                                <th>Sender</th>
-                                <th>Date</th>
-                                <th>Category</th>
-                                <th>Status</th>
-                                <th>Actions</th>
-                            </tr>
-                        </thead>
-                        <tbody id="documents-list">
-                            <tr>
-                                <td class="document-name">
-                                    <i data-feather="file-text"></i>
-                                    <span>Invoice_2024_001.pdf</span>
-                                </td>
-                                <td>2.3 MB</td>
-                                <td>accounting@supplier.com</td>
-                                <td>2024-06-02</td>
-                                <td>
-                                    <span class="category-badge" style="background-color: #ef4444">Invoices</span>
-                                </td>
-                                <td>
-                                    <span class="status status--success">Processed</span>
-                                </td>
-                                <td>
-                                    <div class="table-actions">
-                                        <button class="btn btn--sm">
-                                            <i data-feather="eye"></i>
-                                        </button>
-                                        <button class="btn btn--sm">
-                                            <i data-feather="download"></i>
-                                        </button>
-                                        <button class="btn btn--sm">
-                                            <i data-feather="trash-2"></i>
-                                        </button>
-                                    </div>
-                                </td>
-                            </tr>
-                            <tr>
-                                <td class="document-name">
-                                    <i data-feather="file-text"></i>
-                                    <span>Contract_Agreement.docx</span>
-                                </td>
-                                <td>1.8 MB</td>
-                                <td>legal@partner.com</td>
-                                <td>2024-06-01</td>
-                                <td>
-                                    <span class="category-badge" style="background-color: #f97316">Contracts</span>
-                                </td>
-                                <td>
-                                    <span class="status status--success">Processed</span>
-                                </td>
-                                <td>
-                                    <div class="table-actions">
-                                        <button class="btn btn--sm">
-                                            <i data-feather="eye"></i>
-                                        </button>
-                                        <button class="btn btn--sm">
-                                            <i data-feather="download"></i>
-                                        </button>
-                                        <button class="btn btn--sm">
-                                            <i data-feather="trash-2"></i>
-                                        </button>
-                                    </div>
-                                </td>
-                            </tr>
-                            <tr>
-                                <td class="document-name">
-                                    <i data-feather="file-text"></i>
-                                    <span>Monthly_Report.xlsx</span>
-                                </td>
-                                <td>5.2 MB</td>
-                                <td>reports@analytics.com</td>
-                                <td>2024-05-31</td>
-                                <td>
-                                    <span class="category-badge" style="background-color: #eab308">Reports</span>
-                                </td>
-                                <td>
-                                    <span class="status status--success">Processed</span>
-                                </td>
-                                <td>
-                                    <div class="table-actions">
-                                        <button class="btn btn--sm">
-                                            <i data-feather="eye"></i>
-                                        </button>
-                                        <button class="btn btn--sm">
-                                            <i data-feather="download"></i>
-                                        </button>
-                                        <button class="btn btn--sm">
-                                            <i data-feather="trash-2"></i>
-                                        </button>
-                                    </div>
-                                </td>
-                            </tr>
-                            <tr>
-                                <td class="document-name">
-                                    <i data-feather="file-text"></i>
-                                    <span>Presentation_Q2.pptx</span>
-                                </td>
-                                <td>8.7 MB</td>
-                                <td>marketing@team.com</td>
-                                <td>2024-05-30</td>
-                                <td>
-                                    <span class="category-badge" style="background-color: #22c55e">Presentations</span>
-                                </td>
-                                <td>
-                                    <span class="status status--success">Processed</span>
-                                </td>
-                                <td>
-                                    <div class="table-actions">
-                                        <button class="btn btn--sm">
-                                            <i data-feather="eye"></i>
-                                        </button>
-                                        <button class="btn btn--sm">
-                                            <i data-feather="download"></i>
-                                        </button>
-                                        <button class="btn btn--sm">
-                                            <i data-feather="trash-2"></i>
-                                        </button>
-                                    </div>
-                                </td>
-                            </tr>
-                            <tr>
-                                <td class="document-name">
-                                    <i data-feather="file-text"></i>
-                                    <span>Product_Images.zip</span>
-                                </td>
-                                <td>15.4 MB</td>
-                                <td>design@creative.com</td>
-                                <td>2024-05-29</td>
-                                <td>
-                                    <span class="category-badge" style="background-color: #8b5cf6">Archives</span>
-                                </td>
-                                <td>
-                                    <span class="status status--success">Processed</span>
-                                </td>
-                                <td>
-                                    <div class="table-actions">
-                                        <button class="btn btn--sm">
-                                            <i data-feather="eye"></i>
-                                        </button>
-                                        <button class="btn btn--sm">
-                                            <i data-feather="download"></i>
-                                        </button>
-                                        <button class="btn btn--sm">
-                                            <i data-feather="trash-2"></i>
-                                        </button>
-                                    </div>
-                                </td>
-                            </tr>
-                        </tbody>
-                    </table>
-                </div>
-
-                <div class="pagination">
-                    <button class="pagination-btn" disabled>
-                        <i data-feather="chevron-left"></i>
-                    </button>
-                    <button class="pagination-btn active">1</button>
-                    <button class="pagination-btn">2</button>
-                    <button class="pagination-btn">3</button>
-                    <button class="pagination-btn">
-                        <i data-feather="chevron-right"></i>
-                    </button>
-                </div>
-            </section>
-
-            <!-- Upload Section -->
-            <section id="upload" class="content-section">
-                <div class="upload-container">
-                    <div class="upload-area" id="dropzone">
-                        <div class="upload-content">
-                            <i data-feather="upload-cloud" class="upload-icon"></i>
-                            <h3>Drag & Drop Files Here</h3>
-                            <p>or</p>
-                            <label for="file-input" class="btn btn--primary">
-                                Browse Files
-                                <input type="file" id="file-input" multiple hidden>
-                            </label>
-                            <p class="upload-info">Supported formats: PDF, DOCX, XLSX, PPTX, PNG, JPG, ZIP</p>
-                        </div>
-                    </div>
-
-                    <div class="upload-progress-container" id="upload-progress-container">
-                        <h3 class="section-title">Uploads</h3>
-                        <div class="progress-list" id="progress-list"></div>
-                    </div>
-
-                    <div class="recent-uploads">
-                        <h3 class="section-title">Recent Uploads</h3>
-                        <table class="upload-table">
-                            <thead>
-                                <tr>
-                                    <th>Name</th>
-                                    <th>Size</th>
-                                    <th>Type</th>
-                                    <th>Upload Date</th>
-                                    <th>Status</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                <tr>
-                                    <td class="document-name">
-                                        <i data-feather="file-text"></i>
-                                        <span>Contract_Agreement.docx</span>
-                                    </td>
-                                    <td>1.8 MB</td>
-                                    <td>Document</td>
-                                    <td>2024-06-02</td>
-                                    <td>
-                                        <span class="status status--success">Complete</span>
-                                    </td>
-                                </tr>
-                            </tbody>
-                        </table>
-                    </div>
-                </div>
-            </section>
-
-            <!-- Settings Section -->
-            <section id="settings" class="content-section">
-                <div class="settings-container">
-                    <div class="settings-card">
-                        <div class="card__header">
-                            <h3>Sync Settings</h3>
-                        </div>
-                        <div class="card__body">
-                            <div class="form-group">
-                                <div class="setting-row">
-                                    <div class="setting-label">
-                                        <label class="form-label">Auto-Sync</label>
-                                        <p class="setting-desc">Automatically sync connected email accounts</p>
-                                    </div>
-                                    <div class="setting-control">
-                                        <label class="toggle">
-                                            <input type="checkbox" id="auto-sync-toggle" checked>
-                                            <span class="toggle-slider"></span>
-                                        </label>
-                                    </div>
-                                </div>
-                            </div>
-                            
-                            <div class="form-group">
-                                <div class="setting-row">
-                                    <div class="setting-label">
-                                        <label class="form-label">Sync Interval (minutes)</label>
-                                        <p class="setting-desc">How often to check for new emails</p>
-                                    </div>
-                                    <div class="setting-control">
-                                        <select class="form-control" id="sync-interval">
-                                            <option value="1">1</option>
-                                            <option value="5">5</option>
-                                            <option value="10">10</option>
-                                            <option value="15">15</option>
-                                            <option value="30">30</option>
-                                            <option value="60">60</option>
-                                        </select>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-
-                    <div class="settings-card">
-                        <div class="card__header">
-                            <h3>Storage Settings</h3>
-                        </div>
-                        <div class="card__body">
-                            <div class="form-group">
-                                <div class="setting-row">
-                                    <div class="setting-label">
-                                        <label class="form-label">Maximum File Size (MB)</label>
-                                        <p class="setting-desc">Maximum size for individual files</p>
-                                    </div>
-                                    <div class="setting-control">
-                                        <input type="number" class="form-control" id="max-file-size" value="50">
-                                    </div>
-                                </div>
-                            </div>
-                            
-                            <div class="form-group">
-                                <div class="setting-row">
-                                    <div class="setting-label">
-                                        <label class="form-label">Retention Period (months)</label>
-                                        <p class="setting-desc">How long to keep documents</p>
-                                    </div>
-                                    <div class="setting-control">
-                                        <input type="number" class="form-control" id="retention-period" value="24">
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-
-                    <div class="settings-card">
-                        <div class="card__header">
-                            <h3>Notification Settings</h3>
-                        </div>
-                        <div class="card__body">
-                            <div class="form-group">
-                                <div class="setting-row">
-                                    <div class="setting-label">
-                                        <label class="form-label">Email Notifications</label>
-                                        <p class="setting-desc">Receive email notifications for important events</p>
-                                    </div>
-                                    <div class="setting-control">
-                                        <label class="toggle">
-                                            <input type="checkbox" id="email-notifications-toggle" checked>
-                                            <span class="toggle-slider"></span>
-                                        </label>
-                                    </div>
-                                </div>
-                            </div>
-                            
-                            <div class="form-group">
-                                <div class="setting-row">
-                                    <div class="setting-label">
-                                        <label class="form-label">Error Notifications</label>
-                                        <p class="setting-desc">Receive notifications about system errors</p>
-                                    </div>
-                                    <div class="setting-control">
-                                        <label class="toggle">
-                                            <input type="checkbox" id="error-notifications-toggle" checked>
-                                            <span class="toggle-slider"></span>
-                                        </label>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-
-                    <div class="settings-actions">
-                        <button class="btn btn--primary">Save Changes</button>
-                        <button class="btn btn--secondary">Reset to Default</button>
-                    </div>
-                </div>
-            </section>
-        </main>
-    </div>
-
-    <!-- Add Account Modal -->
-    <div id="add-account-modal" class="modal">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h3>Add Email Account</h3>
-                <button class="modal-close" id="modal-close">
-                    <i data-feather="x"></i>
-                </button>
-            </div>
-            <div class="modal-body">
-                <form id="add-account-form">
+            <!-- Login Form -->
+            <div id="login-form" class="auth-form active">
+                <h2>Sign In</h2>
+                <form id="login-form-element">
                     <div class="form-group">
-                        <label class="form-label" for="email-provider">Email Provider</label>
-                        <select class="form-control" id="email-provider">
-                            <option value="gmail">Gmail</option>
-                            <option value="outlook">Outlook</option>
-                            <option value="yahoo">Yahoo</option>
-                            <option value="imap">IMAP/Custom</option>
-                        </select>
+                        <label for="login-email" class="form-label">Email</label>
+                        <input type="email" id="login-email" class="form-control" placeholder="Enter your email" required>
+                        <span class="error-message" id="login-email-error"></span>
                     </div>
-                    
                     <div class="form-group">
-                        <label class="form-label" for="email-address">Email Address</label>
-                        <input type="email" class="form-control" id="email-address" placeholder="example@domain.com">
-                    </div>
-                    
-                    <div class="form-group">
-                        <label class="form-label" for="email-password">Password</label>
-                        <input type="password" class="form-control" id="email-password" placeholder="•••••••••••">
-                        <p class="form-hint">Your credentials are encrypted and stored securely.</p>
-                    </div>
-                    
-                    <div id="imap-settings" class="hidden">
-                        <div class="form-group">
-                            <label class="form-label" for="imap-server">IMAP Server</label>
-                            <input type="text" class="form-control" id="imap-server" placeholder="imap.example.com">
+                        <label for="login-password" class="form-label">Password</label>
+                        <div class="password-field">
+                            <input type="password" id="login-password" class="form-control" placeholder="Enter your password" required>
+                            <button type="button" class="password-toggle" id="login-password-toggle">
+                                <span class="password-toggle-icon">👁️</span>
+                            </button>
                         </div>
-                        
-                        <div class="form-group">
-                            <label class="form-label" for="imap-port">IMAP Port</label>
-                            <input type="text" class="form-control" id="imap-port" placeholder="993">
-                        </div>
+                        <span class="error-message" id="login-password-error"></span>
                     </div>
+                    <div class="form-group checkbox-group">
+                        <label class="checkbox-label">
+                            <input type="checkbox" id="remember-me">
+                            <span class="checkmark"></span>
+                            Remember me
+                        </label>
+                        <a href="#" class="forgot-password">Forgot password?</a>
+                    </div>
+                    <button type="submit" class="btn btn--primary btn--full-width auth-btn">
+                        <span class="btn-text">Sign In</span>
+                        <span class="btn-loader hidden">Signing in...</span>
+                    </button>
                 </form>
+                <div class="auth-switch">
+                    <p>Don't have an account? <a href="#" id="show-register">Sign up</a></p>
+                </div>
             </div>
-            <div class="modal-footer">
-                <button class="btn btn--secondary" id="cancel-add-account">Cancel</button>
-                <button class="btn btn--primary" id="submit-add-account">Add Account</button>
+
+            <!-- Register Form -->
+            <div id="register-form" class="auth-form">
+                <h2>Create Account</h2>
+                <form id="register-form-element">
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="register-firstname" class="form-label">First Name</label>
+                            <input type="text" id="register-firstname" class="form-control" placeholder="Enter first name" required>
+                            <span class="error-message" id="register-firstname-error"></span>
+                        </div>
+                        <div class="form-group">
+                            <label for="register-lastname" class="form-label">Last Name</label>
+                            <input type="text" id="register-lastname" class="form-control" placeholder="Enter last name" required>
+                            <span class="error-message" id="register-lastname-error"></span>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label for="register-email" class="form-label">Email</label>
+                        <input type="email" id="register-email" class="form-control" placeholder="Enter your email" required>
+                        <span class="error-message" id="register-email-error"></span>
+                    </div>
+                    <div class="form-group">
+                        <label for="register-password" class="form-label">Password</label>
+                        <div class="password-field">
+                            <input type="password" id="register-password" class="form-control" placeholder="Create password" required>
+                            <button type="button" class="password-toggle" id="register-password-toggle">
+                                <span class="password-toggle-icon">👁️</span>
+                            </button>
+                        </div>
+                        <span class="error-message" id="register-password-error"></span>
+                    </div>
+                    <div class="form-group">
+                        <label for="register-confirm-password" class="form-label">Confirm Password</label>
+                        <div class="password-field">
+                            <input type="password" id="register-confirm-password" class="form-control" placeholder="Confirm password" required>
+                            <button type="button" class="password-toggle" id="register-confirm-password-toggle">
+                                <span class="password-toggle-icon">👁️</span>
+                            </button>
+                        </div>
+                        <span class="error-message" id="register-confirm-password-error"></span>
+                    </div>
+                    <button type="submit" class="btn btn--primary btn--full-width auth-btn">
+                        <span class="btn-text">Create Account</span>
+                        <span class="btn-loader hidden">Creating account...</span>
+                    </button>
+                </form>
+                <div class="auth-switch">
+                    <p>Already have an account? <a href="#" id="show-login">Sign in</a></p>
+                </div>
             </div>
         </div>
     </div>
 
-    <!-- Toast Notification -->
-    <div id="toast-container" class="toast-container"></div>
+    <!-- Main Dashboard -->
+    <div id="dashboard-section" class="dashboard-section hidden">
+        <!-- Header -->
+        <header class="dashboard-header">
+            <div class="header-content">
+                <div class="header-left">
+                    <h1>Email Document Collector</h1>
+                </div>
+                <div class="header-right">
+                    <div class="user-menu">
+                        <span class="user-name" id="user-name">Welcome back!</span>
+                        <button class="btn btn--outline btn--sm" id="logout-btn">Logout</button>
+                    </div>
+                </div>
+            </div>
+        </header>
+
+        <div class="dashboard-layout">
+            <!-- Sidebar -->
+            <aside class="dashboard-sidebar">
+                <nav class="sidebar-nav">
+                    <ul class="nav-list">
+                        <li class="nav-item">
+                            <a href="#" class="nav-link active" data-section="dashboard">
+                                <span class="nav-icon">📊</span>
+                                Dashboard
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a href="#" class="nav-link" data-section="email-accounts">
+                                <span class="nav-icon">📧</span>
+                                Email Accounts
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a href="#" class="nav-link" data-section="documents">
+                                <span class="nav-icon">📄</span>
+                                Documents
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a href="#" class="nav-link" data-section="upload">
+                                <span class="nav-icon">⬆️</span>
+                                Upload
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a href="#" class="nav-link" data-section="settings">
+                                <span class="nav-icon">⚙️</span>
+                                Settings
+                            </a>
+                        </li>
+                    </ul>
+                </nav>
+            </aside>
+
+            <!-- Main Content -->
+            <main class="dashboard-main">
+                <!-- Dashboard Section -->
+                <div id="dashboard-content" class="content-section active">
+                    <div class="section-header">
+                        <h2>Dashboard Overview</h2>
+                        <p>Monitor your email document collection activity</p>
+                    </div>
+
+                    <div class="stats-grid">
+                        <div class="stat-card">
+                            <div class="stat-icon">📄</div>
+                            <div class="stat-content">
+                                <h3 id="total-documents">2,846</h3>
+                                <p>Total Documents</p>
+                            </div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-icon">📧</div>
+                            <div class="stat-content">
+                                <h3 id="active-accounts">3</h3>
+                                <p>Active Email Accounts</p>
+                            </div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-icon">⚠️</div>
+                            <div class="stat-content">
+                                <h3 id="errors-today">0</h3>
+                                <p>Errors Today</p>
+                            </div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-icon">💾</div>
+                            <div class="stat-content">
+                                <h3 id="storage-used">45.7 GB</h3>
+                                <p>Storage Used</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="dashboard-widgets">
+                        <div class="widget">
+                            <h3>Document Categories</h3>
+                            <div id="categories-list" class="categories-list">
+                                <!-- Dynamic content -->
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Email Accounts Section -->
+                <div id="email-accounts-content" class="content-section">
+                    <div class="section-header">
+                        <h2>Email Accounts</h2>
+                        <button class="btn btn--primary">Add Account</button>
+                    </div>
+                    <div id="email-accounts-list" class="accounts-list">
+                        <!-- Dynamic content -->
+                    </div>
+                </div>
+
+                <!-- Documents Section -->
+                <div id="documents-content" class="content-section">
+                    <div class="section-header">
+                        <h2>Documents</h2>
+                        <button class="btn btn--primary">Search Documents</button>
+                    </div>
+                    <p>Document management interface will be displayed here.</p>
+                </div>
+
+                <!-- Upload Section -->
+                <div id="upload-content" class="content-section">
+                    <div class="section-header">
+                        <h2>Upload Documents</h2>
+                    </div>
+                    <div class="upload-area">
+                        <div class="upload-dropzone">
+                            <div class="upload-icon">📁</div>
+                            <h3>Drag and drop files here</h3>
+                            <p>or <button class="btn btn--outline">Browse Files</button></p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Settings Section -->
+                <div id="settings-content" class="content-section">
+                    <div class="section-header">
+                        <h2>Settings</h2>
+                    </div>
+                    <div class="settings-grid">
+                        <div class="card">
+                            <div class="card__body">
+                                <h3>Profile Settings</h3>
+                                <form id="profile-form">
+                                    <div class="form-group">
+                                        <label for="profile-firstname" class="form-label">First Name</label>
+                                        <input type="text" id="profile-firstname" class="form-control">
+                                    </div>
+                                    <div class="form-group">
+                                        <label for="profile-lastname" class="form-label">Last Name</label>
+                                        <input type="text" id="profile-lastname" class="form-control">
+                                    </div>
+                                    <div class="form-group">
+                                        <label for="profile-email" class="form-label">Email</label>
+                                        <input type="email" id="profile-email" class="form-control" readonly>
+                                    </div>
+                                    <button type="submit" class="btn btn--primary">Update Profile</button>
+                                </form>
+                            </div>
+                        </div>
+                        <div class="card">
+                            <div class="card__body">
+                                <h3>Change Password</h3>
+                                <form id="password-form">
+                                    <div class="form-group">
+                                        <label for="current-password" class="form-label">Current Password</label>
+                                        <input type="password" id="current-password" class="form-control">
+                                    </div>
+                                    <div class="form-group">
+                                        <label for="new-password" class="form-label">New Password</label>
+                                        <input type="password" id="new-password" class="form-control">
+                                    </div>
+                                    <div class="form-group">
+                                        <label for="confirm-new-password" class="form-label">Confirm New Password</label>
+                                        <input type="password" id="confirm-new-password" class="form-control">
+                                    </div>
+                                    <button type="submit" class="btn btn--primary">Change Password</button>
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </main>
+        </div>
+    </div>
 
     <script src="app.js"></script>
 </body>
