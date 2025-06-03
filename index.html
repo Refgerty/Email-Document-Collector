@@ -1,305 +1,193 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="ru">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Email Document Collector</title>
     <link rel="stylesheet" href="style.css">
+    <meta http-equiv="Content-Security-Policy" content="default-src 'self' https://apis.google.com https://accounts.google.com; script-src 'self' 'unsafe-inline' https://apis.google.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com https://www.perplexity.ai;">
 </head>
 <body>
-    <!-- Toast Notifications -->
-    <div id="toast-container" class="toast-container"></div>
-
-    <!-- Authentication Section -->
-    <div id="auth-section" class="auth-section">
-        <div class="auth-container">
-            <div class="auth-header">
-                <h1>Email Document Collector</h1>
-                <p>Manage and organize your email documents efficiently</p>
-            </div>
-
-            <!-- Login Form -->
-            <div id="login-form" class="auth-form active">
-                <h2>Sign In</h2>
-                <form id="login-form-element">
-                    <div class="form-group">
-                        <label for="login-email" class="form-label">Email</label>
-                        <input type="email" id="login-email" class="form-control" placeholder="Enter your email" required>
-                        <span class="error-message" id="login-email-error"></span>
-                    </div>
-                    <div class="form-group">
-                        <label for="login-password" class="form-label">Password</label>
-                        <div class="password-field">
-                            <input type="password" id="login-password" class="form-control" placeholder="Enter your password" required>
-                            <button type="button" class="password-toggle" id="login-password-toggle">
-                                <span class="password-toggle-icon">👁️</span>
-                            </button>
-                        </div>
-                        <span class="error-message" id="login-password-error"></span>
-                    </div>
-                    <div class="form-group checkbox-group">
-                        <label class="checkbox-label">
-                            <input type="checkbox" id="remember-me">
-                            <span class="checkmark"></span>
-                            Remember me
-                        </label>
-                        <a href="#" class="forgot-password">Forgot password?</a>
-                    </div>
-                    <button type="submit" class="btn btn--primary btn--full-width auth-btn">
-                        <span class="btn-text">Sign In</span>
-                        <span class="btn-loader hidden">Signing in...</span>
-                    </button>
-                </form>
-                <div class="auth-switch">
-                    <p>Don't have an account? <a href="#" id="show-register">Sign up</a></p>
-                </div>
-            </div>
-
-            <!-- Register Form -->
-            <div id="register-form" class="auth-form">
-                <h2>Create Account</h2>
-                <form id="register-form-element">
-                    <div class="form-row">
-                        <div class="form-group">
-                            <label for="register-firstname" class="form-label">First Name</label>
-                            <input type="text" id="register-firstname" class="form-control" placeholder="Enter first name" required>
-                            <span class="error-message" id="register-firstname-error"></span>
-                        </div>
-                        <div class="form-group">
-                            <label for="register-lastname" class="form-label">Last Name</label>
-                            <input type="text" id="register-lastname" class="form-control" placeholder="Enter last name" required>
-                            <span class="error-message" id="register-lastname-error"></span>
-                        </div>
-                    </div>
-                    <div class="form-group">
-                        <label for="register-email" class="form-label">Email</label>
-                        <input type="email" id="register-email" class="form-control" placeholder="Enter your email" required>
-                        <span class="error-message" id="register-email-error"></span>
-                    </div>
-                    <div class="form-group">
-                        <label for="register-password" class="form-label">Password</label>
-                        <div class="password-field">
-                            <input type="password" id="register-password" class="form-control" placeholder="Create password" required>
-                            <button type="button" class="password-toggle" id="register-password-toggle">
-                                <span class="password-toggle-icon">👁️</span>
-                            </button>
-                        </div>
-                        <span class="error-message" id="register-password-error"></span>
-                    </div>
-                    <div class="form-group">
-                        <label for="register-confirm-password" class="form-label">Confirm Password</label>
-                        <div class="password-field">
-                            <input type="password" id="register-confirm-password" class="form-control" placeholder="Confirm password" required>
-                            <button type="button" class="password-toggle" id="register-confirm-password-toggle">
-                                <span class="password-toggle-icon">👁️</span>
-                            </button>
-                        </div>
-                        <span class="error-message" id="register-confirm-password-error"></span>
-                    </div>
-                    <button type="submit" class="btn btn--primary btn--full-width auth-btn">
-                        <span class="btn-text">Create Account</span>
-                        <span class="btn-loader hidden">Creating account...</span>
-                    </button>
-                </form>
-                <div class="auth-switch">
-                    <p>Already have an account? <a href="#" id="show-login">Sign in</a></p>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <!-- Main Dashboard -->
-    <div id="dashboard-section" class="dashboard-section hidden">
+    <div id="app">
         <!-- Header -->
-        <header class="dashboard-header">
-            <div class="header-content">
-                <div class="header-left">
-                    <h1>Email Document Collector</h1>
-                </div>
-                <div class="header-right">
-                    <div class="user-menu">
-                        <span class="user-name" id="user-name">Welcome back!</span>
-                        <button class="btn btn--outline btn--sm" id="logout-btn">Logout</button>
+        <header class="header">
+            <div class="container">
+                <div class="flex items-center justify-between">
+                    <div class="flex items-center gap-8">
+                        <h1 class="header__title">📧 Email Document Collector</h1>
+                    </div>
+                    <div class="flex items-center gap-16">
+                        <div id="auth-status" class="status status--info hidden">
+                            <span id="user-email"></span>
+                        </div>
+                        <button id="auth-btn" class="btn btn--primary">Connect Gmail</button>
+                        <button id="settings-btn" class="btn btn--outline">⚙️ Настройки</button>
                     </div>
                 </div>
             </div>
         </header>
 
-        <div class="dashboard-layout">
-            <!-- Sidebar -->
-            <aside class="dashboard-sidebar">
-                <nav class="sidebar-nav">
-                    <ul class="nav-list">
-                        <li class="nav-item">
-                            <a href="#" class="nav-link active" data-section="dashboard">
-                                <span class="nav-icon">📊</span>
-                                Dashboard
-                            </a>
-                        </li>
-                        <li class="nav-item">
-                            <a href="#" class="nav-link" data-section="email-accounts">
-                                <span class="nav-icon">📧</span>
-                                Email Accounts
-                            </a>
-                        </li>
-                        <li class="nav-item">
-                            <a href="#" class="nav-link" data-section="documents">
-                                <span class="nav-icon">📄</span>
-                                Documents
-                            </a>
-                        </li>
-                        <li class="nav-item">
-                            <a href="#" class="nav-link" data-section="upload">
-                                <span class="nav-icon">⬆️</span>
-                                Upload
-                            </a>
-                        </li>
-                        <li class="nav-item">
-                            <a href="#" class="nav-link" data-section="settings">
-                                <span class="nav-icon">⚙️</span>
-                                Settings
-                            </a>
-                        </li>
-                    </ul>
-                </nav>
-            </aside>
-
-            <!-- Main Content -->
-            <main class="dashboard-main">
-                <!-- Dashboard Section -->
-                <div id="dashboard-content" class="content-section active">
-                    <div class="section-header">
-                        <h2>Dashboard Overview</h2>
-                        <p>Monitor your email document collection activity</p>
-                    </div>
-
-                    <div class="stats-grid">
-                        <div class="stat-card">
-                            <div class="stat-icon">📄</div>
-                            <div class="stat-content">
-                                <h3 id="total-documents">2,846</h3>
-                                <p>Total Documents</p>
-                            </div>
-                        </div>
-                        <div class="stat-card">
-                            <div class="stat-icon">📧</div>
-                            <div class="stat-content">
-                                <h3 id="active-accounts">3</h3>
-                                <p>Active Email Accounts</p>
-                            </div>
-                        </div>
-                        <div class="stat-card">
-                            <div class="stat-icon">⚠️</div>
-                            <div class="stat-content">
-                                <h3 id="errors-today">0</h3>
-                                <p>Errors Today</p>
-                            </div>
-                        </div>
-                        <div class="stat-card">
-                            <div class="stat-icon">💾</div>
-                            <div class="stat-content">
-                                <h3 id="storage-used">45.7 GB</h3>
-                                <p>Storage Used</p>
-                            </div>
-                        </div>
-                    </div>
-
-                    <div class="dashboard-widgets">
-                        <div class="widget">
-                            <h3>Document Categories</h3>
-                            <div id="categories-list" class="categories-list">
-                                <!-- Dynamic content -->
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Email Accounts Section -->
-                <div id="email-accounts-content" class="content-section">
-                    <div class="section-header">
-                        <h2>Email Accounts</h2>
-                        <button class="btn btn--primary">Add Account</button>
-                    </div>
-                    <div id="email-accounts-list" class="accounts-list">
-                        <!-- Dynamic content -->
-                    </div>
-                </div>
-
-                <!-- Documents Section -->
-                <div id="documents-content" class="content-section">
-                    <div class="section-header">
-                        <h2>Documents</h2>
-                        <button class="btn btn--primary">Search Documents</button>
-                    </div>
-                    <p>Document management interface will be displayed here.</p>
-                </div>
-
-                <!-- Upload Section -->
-                <div id="upload-content" class="content-section">
-                    <div class="section-header">
-                        <h2>Upload Documents</h2>
-                    </div>
-                    <div class="upload-area">
-                        <div class="upload-dropzone">
-                            <div class="upload-icon">📁</div>
-                            <h3>Drag and drop files here</h3>
-                            <p>or <button class="btn btn--outline">Browse Files</button></p>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Settings Section -->
-                <div id="settings-content" class="content-section">
-                    <div class="section-header">
-                        <h2>Settings</h2>
-                    </div>
-                    <div class="settings-grid">
+        <!-- Main Content -->
+        <main class="main">
+            <div class="container">
+                <!-- Dashboard -->
+                <section id="dashboard" class="dashboard">
+                    <div class="dashboard__stats">
                         <div class="card">
                             <div class="card__body">
-                                <h3>Profile Settings</h3>
-                                <form id="profile-form">
-                                    <div class="form-group">
-                                        <label for="profile-firstname" class="form-label">First Name</label>
-                                        <input type="text" id="profile-firstname" class="form-control">
+                                <div class="stat">
+                                    <div class="stat__icon">📄</div>
+                                    <div class="stat__content">
+                                        <div class="stat__value" id="total-docs">0</div>
+                                        <div class="stat__label">Всего документов</div>
                                     </div>
-                                    <div class="form-group">
-                                        <label for="profile-lastname" class="form-label">Last Name</label>
-                                        <input type="text" id="profile-lastname" class="form-control">
-                                    </div>
-                                    <div class="form-group">
-                                        <label for="profile-email" class="form-label">Email</label>
-                                        <input type="email" id="profile-email" class="form-control" readonly>
-                                    </div>
-                                    <button type="submit" class="btn btn--primary">Update Profile</button>
-                                </form>
+                                </div>
                             </div>
                         </div>
                         <div class="card">
                             <div class="card__body">
-                                <h3>Change Password</h3>
-                                <form id="password-form">
-                                    <div class="form-group">
-                                        <label for="current-password" class="form-label">Current Password</label>
-                                        <input type="password" id="current-password" class="form-control">
+                                <div class="stat">
+                                    <div class="stat__icon">🔄</div>
+                                    <div class="stat__content">
+                                        <div class="stat__value" id="last-sync">Никогда</div>
+                                        <div class="stat__label">Последняя синхронизация</div>
                                     </div>
-                                    <div class="form-group">
-                                        <label for="new-password" class="form-label">New Password</label>
-                                        <input type="password" id="new-password" class="form-control">
+                                </div>
+                            </div>
+                        </div>
+                        <div class="card">
+                            <div class="card__body">
+                                <div class="stat">
+                                    <div class="stat__icon">📊</div>
+                                    <div class="stat__content">
+                                        <div class="stat__value" id="categories-count">0</div>
+                                        <div class="stat__label">Категорий</div>
                                     </div>
-                                    <div class="form-group">
-                                        <label for="confirm-new-password" class="form-label">Confirm New Password</label>
-                                        <input type="password" id="confirm-new-password" class="form-control">
-                                    </div>
-                                    <button type="submit" class="btn btn--primary">Change Password</button>
-                                </form>
+                                </div>
                             </div>
                         </div>
                     </div>
+
+                    <div class="dashboard__actions">
+                        <button id="sync-btn" class="btn btn--primary btn--lg" disabled>
+                            <span id="sync-text">Синхронизировать</span>
+                        </button>
+                        <div id="sync-progress" class="progress hidden">
+                            <div class="progress__bar">
+                                <div id="progress-fill" class="progress__fill"></div>
+                            </div>
+                            <div id="progress-text" class="progress__text">Сканирование писем...</div>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- Documents List -->
+                <section id="documents-section" class="documents">
+                    <div class="documents__header">
+                        <h2>Документы</h2>
+                        <div class="documents__controls">
+                            <div class="form-group">
+                                <input type="text" id="search-input" class="form-control" placeholder="Поиск по имени файла...">
+                            </div>
+                            <div class="form-group">
+                                <select id="category-filter" class="form-control">
+                                    <option value="">Все категории</option>
+                                    <option value="pdf">📄 PDF Documents</option>
+                                    <option value="word">📝 Word Documents</option>
+                                    <option value="excel">📊 Excel Spreadsheets</option>
+                                    <option value="powerpoint">📈 Presentations</option>
+                                    <option value="images">🖼️ Images</option>
+                                    <option value="archives">🗜️ Archives</option>
+                                    <option value="other">📎 Other Files</option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="card">
+                        <div class="documents__table-wrapper">
+                            <table class="documents__table">
+                                <thead>
+                                    <tr>
+                                        <th>Имя файла</th>
+                                        <th>Размер</th>
+                                        <th>Дата получения</th>
+                                        <th>От кого</th>
+                                        <th>Категория</th>
+                                        <th>Действия</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="documents-list">
+                                    <tr id="no-documents" class="documents__empty">
+                                        <td colspan="6">
+                                            <div class="empty-state">
+                                                <div class="empty-state__icon">📭</div>
+                                                <div class="empty-state__text">Документы не найдены</div>
+                                                <div class="empty-state__hint">Подключите Gmail и запустите синхронизацию</div>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- Settings Modal -->
+                <div id="settings-modal" class="modal hidden">
+                    <div class="modal__backdrop"></div>
+                    <div class="modal__content">
+                        <div class="modal__header">
+                            <h3>Настройки</h3>
+                            <button id="close-settings" class="modal__close">✕</button>
+                        </div>
+                        <div class="modal__body">
+                            <div class="form-group">
+                                <label class="form-label">Автоматическая синхронизация</label>
+                                <select id="auto-sync-interval" class="form-control">
+                                    <option value="0">Отключена</option>
+                                    <option value="900000">Каждые 15 минут</option>
+                                    <option value="1800000" selected>Каждые 30 минут</option>
+                                    <option value="3600000">Каждый час</option>
+                                </select>
+                            </div>
+                            <div class="form-group">
+                                <label class="form-label">Максимальный размер файла (МБ)</label>
+                                <input type="number" id="max-file-size" class="form-control" value="50" min="1" max="100">
+                            </div>
+                            <div class="form-group">
+                                <label class="form-label">Типы файлов для сбора</label>
+                                <div class="checkbox-group">
+                                    <label class="checkbox-item">
+                                        <input type="checkbox" id="collect-pdf" checked> PDF документы
+                                    </label>
+                                    <label class="checkbox-item">
+                                        <input type="checkbox" id="collect-word" checked> Word документы
+                                    </label>
+                                    <label class="checkbox-item">
+                                        <input type="checkbox" id="collect-excel" checked> Excel таблицы
+                                    </label>
+                                    <label class="checkbox-item">
+                                        <input type="checkbox" id="collect-images" checked> Изображения
+                                    </label>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="modal__footer">
+                            <button id="save-settings" class="btn btn--primary">Сохранить</button>
+                            <button id="clear-documents" class="btn btn--outline btn--danger">Очистить все документы</button>
+                        </div>
+                    </div>
                 </div>
-            </main>
-        </div>
+
+                <!-- Toast Notifications -->
+                <div id="toast-container" class="toast-container"></div>
+            </div>
+        </main>
     </div>
 
+    <!-- Google APIs -->
+    <script src="https://apis.google.com/js/api.js"></script>
     <script src="app.js"></script>
 </body>
 </html>
